@@ -1,14 +1,22 @@
 <script lang="ts">
 	import { theme, toggleTheme } from '$lib/stores/theme';
-	import { Sun, Moon, Github, ArrowRight } from 'lucide-svelte';
+	import { Sun, Moon, Github, ArrowRight, ChevronDown, BookOpen, Shield, Lock, FileText } from 'lucide-svelte';
 
-	let scrolled = false;
+	let scrolled = $state(false);
+	let docsOpen = $state(false);
 
 	if (typeof window !== 'undefined') {
 		window.addEventListener('scroll', () => {
 			scrolled = window.scrollY > 20;
 		});
 	}
+
+	const docsItems = [
+		{ label: 'Developer Docs', href: '/docs/getting-started', Icon: BookOpen, desc: 'Guides, CLI reference, and API docs' },
+		{ label: 'Security',       href: '/security',             Icon: Shield,   desc: 'Architecture, sandbox, and disclosure' },
+		{ label: 'Privacy',        href: '/privacy',              Icon: Lock,     desc: 'What we collect and how we use it' },
+		{ label: 'Terms',          href: '/terms',                Icon: FileText, desc: 'Terms of Service' },
+	];
 </script>
 
 <nav class:scrolled>
@@ -31,12 +39,40 @@
 			<a href="#features" class="nav-link">Features</a>
 			<a href="#how-it-works" class="nav-link">How it works</a>
 			<a href="#pricing" class="nav-link">Pricing</a>
-			<a href="/docs/getting-started" class="nav-link">Docs</a>
+
+			<!-- Docs dropdown -->
+			<div
+				class="docs-trigger"
+				role="navigation"
+				onmouseenter={() => docsOpen = true}
+				onmouseleave={() => docsOpen = false}
+			>
+				<button class="nav-link docs-btn" aria-haspopup="true" aria-expanded={docsOpen}>
+					Docs
+					<ChevronDown size={13} class={docsOpen ? 'chevron open' : 'chevron'} />
+				</button>
+
+				{#if docsOpen}
+					<div class="dropdown" role="menu">
+						{#each docsItems as item}
+							<a href={item.href} class="dropdown-item" role="menuitem">
+								<span class="dropdown-icon">
+									<item.Icon size={15} />
+								</span>
+								<span class="dropdown-text">
+									<span class="dropdown-label">{item.label}</span>
+									<span class="dropdown-desc">{item.desc}</span>
+								</span>
+							</a>
+						{/each}
+					</div>
+				{/if}
+			</div>
 		</div>
 
 		<!-- Actions -->
 		<div class="nav-actions">
-			<button class="theme-toggle" on:click={toggleTheme} aria-label="Toggle theme">
+			<button class="theme-toggle" onclick={toggleTheme} aria-label="Toggle theme">
 				{#if $theme === 'dark'}
 					<Sun size={15} />
 				{:else}
@@ -103,6 +139,82 @@
 	}
 	.nav-link:hover { color: var(--text); }
 
+	/* Docs dropdown trigger */
+	.docs-trigger {
+		position: relative;
+	}
+
+	.docs-btn {
+		display: inline-flex; align-items: center; gap: 0.3rem;
+		background: none; border: none; padding: 0;
+		font-size: 0.875rem; cursor: pointer;
+	}
+
+	:global(.chevron) {
+		color: var(--muted);
+		transition: transform 0.2s;
+	}
+	:global(.chevron.open) {
+		transform: rotate(180deg);
+	}
+
+	/* Dropdown panel */
+	.dropdown {
+		position: absolute; top: calc(100% + 0.75rem); left: 50%;
+		transform: translateX(-50%);
+		width: 16rem;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 0.4rem;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+		z-index: 100;
+	}
+
+	/* Arrow pointer */
+	.dropdown::before {
+		content: '';
+		position: absolute; top: -6px; left: 50%;
+		transform: translateX(-50%) rotate(45deg);
+		width: 10px; height: 10px;
+		background: var(--surface);
+		border-left: 1px solid var(--border);
+		border-top: 1px solid var(--border);
+	}
+
+	.dropdown-item {
+		display: flex; align-items: flex-start; gap: 0.75rem;
+		padding: 0.65rem 0.75rem;
+		border-radius: 8px;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+	.dropdown-item:hover { background: var(--surface-2); }
+
+	.dropdown-icon {
+		flex-shrink: 0;
+		width: 28px; height: 28px;
+		border-radius: 7px;
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		display: flex; align-items: center; justify-content: center;
+		color: var(--accent);
+		margin-top: 1px;
+	}
+
+	.dropdown-text {
+		display: flex; flex-direction: column; gap: 0.15rem;
+	}
+
+	.dropdown-label {
+		font-size: 0.85rem; font-weight: 600; color: var(--text);
+	}
+
+	.dropdown-desc {
+		font-size: 0.75rem; color: var(--muted); line-height: 1.4;
+	}
+
+	/* Actions */
 	.nav-actions {
 		display: flex; align-items: center; gap: 0.75rem;
 	}
