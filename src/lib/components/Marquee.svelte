@@ -1,26 +1,27 @@
 <script lang="ts">
 	import {
-		Code2, Braces, Cpu, Zap, Coffee, Gem, Globe, Target,
-		CircleDot, Apple, Layers, Leaf, Bolt, Triangle, Server, Rocket
-	} from 'lucide-svelte';
+		siPython, siTypescript, siJavascript, siGo, siRust,
+		siRuby, siPhp, siKotlin, siSwift, siReact,
+		siDjango, siFastapi, siNextdotjs, siNodedotjs, siRubyonrails, siCplusplus
+	} from 'simple-icons';
 
 	const items = [
-		{ name: 'Python',     Icon: Code2 },
-		{ name: 'TypeScript', Icon: Braces },
-		{ name: 'Go',         Icon: Cpu },
-		{ name: 'Rust',       Icon: Zap },
-		{ name: 'Java',       Icon: Coffee },
-		{ name: 'Ruby',       Icon: Gem },
-		{ name: 'PHP',        Icon: Globe },
-		{ name: 'C#',         Icon: Target },
-		{ name: 'Kotlin',     Icon: CircleDot },
-		{ name: 'Swift',      Icon: Apple },
-		{ name: 'React',      Icon: Layers },
-		{ name: 'Django',     Icon: Leaf },
-		{ name: 'FastAPI',    Icon: Bolt },
-		{ name: 'Next.js',    Icon: Triangle },
-		{ name: 'Node.js',    Icon: Server },
-		{ name: 'Rails',      Icon: Rocket },
+		{ name: 'Python',     icon: siPython,       color: '#3776AB' },
+		{ name: 'TypeScript', icon: siTypescript,   color: '#3178C6' },
+		{ name: 'JavaScript', icon: siJavascript,   color: '#F7DF1E' },
+		{ name: 'Go',         icon: siGo,           color: '#00ADD8' },
+		{ name: 'Rust',       icon: siRust,         color: '#CE422B' },
+		{ name: 'Ruby',       icon: siRuby,         color: '#CC342D' },
+		{ name: 'PHP',        icon: siPhp,          color: '#777BB4' },
+		{ name: 'Kotlin',     icon: siKotlin,       color: '#7F52FF' },
+		{ name: 'Swift',      icon: siSwift,        color: '#F05138' },
+		{ name: 'React',      icon: siReact,        color: '#61DAFB' },
+		{ name: 'Django',     icon: siDjango,       color: '#0C4B33' },
+		{ name: 'FastAPI',    icon: siFastapi,      color: '#009688' },
+		{ name: 'Next.js',    icon: siNextdotjs,    color: 'var(--text)' },
+		{ name: 'Node.js',    icon: siNodedotjs,    color: '#5FA04E' },
+		{ name: 'Rails',      icon: siRubyonrails,  color: '#D30001' },
+		{ name: 'C++',        icon: siCplusplus,    color: '#00599C' },
 	];
 
 	const doubled = [...items, ...items];
@@ -33,7 +34,15 @@
 		<div class="animate-marquee">
 			{#each doubled as item}
 				<div class="marquee-item">
-					<svelte:component this={item.Icon} size={15} />
+					<svg
+						viewBox="0 0 24 24"
+						width="15"
+						height="15"
+						fill={item.color}
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path d={item.icon.path} />
+					</svg>
 					<span class="item-name">{item.name}</span>
 				</div>
 			{/each}
