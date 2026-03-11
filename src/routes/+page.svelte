@@ -6,7 +6,6 @@
 	import HowItWorks from '$lib/components/HowItWorks.svelte';
 	import QADemo from '$lib/components/QADemo.svelte';
 	import GitHubIntegration from '$lib/components/GitHubIntegration.svelte';
-	import Pricing from '$lib/components/Pricing.svelte';
 	import Feedback from '$lib/components/Feedback.svelte';
 	import CTA from '$lib/components/CTA.svelte';
 	import Footer from '$lib/components/Footer.svelte';
@@ -20,7 +19,6 @@
 	<HowItWorks />
 	<QADemo />
 	<GitHubIntegration />
-	<Pricing />
 	<Feedback />
 	<CTA />
 </main>
