@@ -9,6 +9,12 @@
 		window.addEventListener('scroll', () => {
 			scrolled = window.scrollY > 20;
 		});
+		window.addEventListener('click', (e) => {
+			const trigger = document.querySelector('.docs-trigger');
+			if (trigger && !trigger.contains(e.target as Node)) {
+				docsOpen = false;
+			}
+		});
 	}
 
 	const docsItems = [
@@ -41,13 +47,13 @@
 			<a href="#pricing" class="nav-link">Pricing</a>
 
 			<!-- Docs dropdown -->
-			<div
-				class="docs-trigger"
-				role="navigation"
-				onmouseenter={() => docsOpen = true}
-				onmouseleave={() => docsOpen = false}
-			>
-				<button class="nav-link docs-btn" aria-haspopup="true" aria-expanded={docsOpen}>
+			<div class="docs-trigger" role="navigation">
+				<button
+					class="nav-link docs-btn"
+					aria-haspopup="true"
+					aria-expanded={docsOpen}
+					onclick={() => docsOpen = !docsOpen}
+				>
 					Docs
 					<ChevronDown size={13} class={docsOpen ? 'chevron open' : 'chevron'} />
 				</button>
@@ -55,7 +61,7 @@
 				{#if docsOpen}
 					<div class="dropdown" role="menu">
 						{#each docsItems as item}
-							<a href={item.href} class="dropdown-item" role="menuitem">
+							<a href={item.href} class="dropdown-item" role="menuitem" onclick={() => docsOpen = false}>
 								<span class="dropdown-icon">
 									<item.Icon size={15} />
 								</span>
