@@ -44,7 +44,7 @@
 		<div class="nav-links">
 			<a href="#features" class="nav-link">Features</a>
 			<a href="#how-it-works" class="nav-link">How it works</a>
-			<a href="#pricing" class="nav-link">Pricing</a>
+			<a href="/pricing" class="nav-link">Pricing</a>
 
 			<!-- Docs dropdown -->
 			<div class="docs-trigger" role="navigation">
@@ -91,7 +91,7 @@
 				GitHub
 			</a>
 
-			<a href="#pricing" class="btn-primary">
+			<a href="/pricing" class="btn-primary">
 				Get started
 				<ArrowRight size={13} />
 			</a>

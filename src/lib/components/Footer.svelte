@@ -5,7 +5,7 @@
 		Product: [
 			{ label: 'Features',   href: '#features' },
 			{ label: 'How it works', href: '#how-it-works' },
-			{ label: 'Pricing',    href: '#pricing' },
+			{ label: 'Pricing',    href: '/pricing' },
 			{ label: 'Changelog',  href: 'https://github.com/the-ai-project-co/RunOwl/blob/main/CHANGELOG.md' },
 		],
 		Developers: [
