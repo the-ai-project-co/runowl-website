@@ -15,9 +15,9 @@
 			{ label: 'GitHub',        href: 'https://github.com/the-ai-project-co/RunOwl' },
 		],
 		Company: [
-			{ label: 'Security', href: 'mailto:security@runowl.ai' },
-			{ label: 'Privacy',  href: '#' },
-			{ label: 'Terms',    href: '#' },
+			{ label: 'Security', href: '/security' },
+			{ label: 'Privacy',  href: '/privacy' },
+			{ label: 'Terms',    href: '/terms' },
 			{ label: 'Contact',  href: 'mailto:hello@runowl.ai' },
 		],
 	};
