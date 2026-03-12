@@ -157,6 +157,35 @@
 				</div>
 			{/if}
 
+			<!-- Test execution status -->
+			{#if reviewStore.testSuite}
+				{@const ts = reviewStore.testSuite}
+				<div class="test-status">
+					<div class="test-status-header">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+						</svg>
+						<span>Tests</span>
+						{#if ts.all_passed}
+							<span class="test-badge pass">passed</span>
+						{:else}
+							<span class="test-badge fail">{ts.failed} failed</span>
+						{/if}
+					</div>
+					<div class="test-bar">
+						{#if ts.total > 0}
+							<div class="test-pass-fill" style="width: {(ts.passed / ts.total) * 100}%;"></div>
+						{/if}
+					</div>
+					<div class="test-counts">
+						<span style="color: var(--green);">{ts.passed} passed</span>
+						{#if ts.failed}<span style="color: var(--red);">{ts.failed} failed</span>{/if}
+						{#if ts.errors}<span style="color: var(--yellow);">{ts.errors} errors</span>{/if}
+						<span style="margin-left: auto; color: var(--muted);">{ts.total} total</span>
+					</div>
+				</div>
+			{/if}
+
 			<!-- PR description (collapsible) -->
 			{#if meta.body}
 				<details class="pr-body">

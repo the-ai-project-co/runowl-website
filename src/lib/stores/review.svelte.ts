@@ -42,6 +42,15 @@ export interface Finding {
 
 export type ReviewStatus = 'idle' | 'loading_pr' | 'ready' | 'reviewing' | 'done' | 'error';
 
+export interface TestSuiteResult {
+	suite_id: string;
+	total: number;
+	passed: number;
+	failed: number;
+	errors: number;
+	all_passed: boolean;
+}
+
 export interface ChatMessage {
 	id: string;
 	role: 'user' | 'assistant';
@@ -61,6 +70,7 @@ function createReviewStore() {
 	let streaming = $state(false);
 	let activeTab = $state<'review' | 'flags' | 'bugs'>('review');
 	let highlightedLine = $state<{ file: string; line: number } | null>(null);
+	let testSuite = $state<TestSuiteResult | null>(null);
 
 	const flags = $derived(findings.filter((f) => f.severity === 'P2' || f.severity === 'P3'));
 	const bugs = $derived(findings.filter((f) => f.severity === 'P0' || f.severity === 'P1'));
@@ -78,6 +88,7 @@ function createReviewStore() {
 		streaming = false;
 		activeTab = 'review';
 		highlightedLine = null;
+		testSuite = null;
 	}
 
 	const CACHE_KEY = 'runowl_pr_cache';
@@ -227,6 +238,15 @@ function createReviewStore() {
 		}
 	}
 
+	async function loadTestResults(suiteId: string) {
+		try {
+			const res = await fetch(`/api/tests/results?suite_id=${encodeURIComponent(suiteId)}`);
+			if (!res.ok) return;
+			const data = await res.json();
+			testSuite = data as TestSuiteResult;
+		} catch { /* silently ignore */ }
+	}
+
 	function selectFile(filename: string) {
 		selectedFile = filename;
 		highlightedLine = null;
@@ -253,6 +273,7 @@ function createReviewStore() {
 		get streaming() { return streaming; },
 		get activeTab() { return activeTab; },
 		get highlightedLine() { return highlightedLine; },
+		get testSuite() { return testSuite; },
 		set activeTab(v: 'review' | 'flags' | 'bugs') { activeTab = v; },
 		reset,
 		loadPR,
@@ -260,6 +281,7 @@ function createReviewStore() {
 		sendMessage,
 		selectFile,
 		highlightFinding,
+		loadTestResults,
 	};
 }
 
