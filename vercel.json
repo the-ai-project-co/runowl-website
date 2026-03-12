@@ -2,5 +2,9 @@
 	"framework": "sveltekit",
 	"buildCommand": "npm run build",
 	"outputDirectory": ".vercel/output",
-	"installCommand": "npm install"
+	"installCommand": "npm install",
+	"env": {
+		"PUBLIC_SUPABASE_URL": "https://placeholder.supabase.co",
+		"PUBLIC_SUPABASE_ANON_KEY": "placeholder_anon_key"
+	}
 }
