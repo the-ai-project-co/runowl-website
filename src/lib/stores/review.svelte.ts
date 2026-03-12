@@ -80,6 +80,29 @@ function createReviewStore() {
 		highlightedLine = null;
 	}
 
+	const CACHE_KEY = 'runowl_pr_cache';
+
+	function saveToSession() {
+		if (typeof sessionStorage === 'undefined') return;
+		try {
+			sessionStorage.setItem(CACHE_KEY, JSON.stringify({ prUrl, meta, files }));
+		} catch { /* quota exceeded — ignore */ }
+	}
+
+	function loadFromSession(url: string): boolean {
+		if (typeof sessionStorage === 'undefined') return false;
+		try {
+			const raw = sessionStorage.getItem(CACHE_KEY);
+			if (!raw) return false;
+			const cached = JSON.parse(raw);
+			if (cached.prUrl !== url) return false;
+			meta = cached.meta;
+			files = cached.files;
+			selectedFile = files[0]?.filename ?? null;
+			return true;
+		} catch { return false; }
+	}
+
 	async function loadPR(url: string) {
 		prUrl = url;
 		status = 'loading_pr';
@@ -88,6 +111,12 @@ function createReviewStore() {
 		files = [];
 		findings = [];
 		chatMessages = [];
+
+		// Try cache first
+		if (loadFromSession(url)) {
+			status = 'ready';
+			return;
+		}
 
 		try {
 			const res = await fetch('/api/pr/load', {
@@ -105,6 +134,7 @@ function createReviewStore() {
 			meta = data.meta;
 			files = data.files;
 			selectedFile = data.files[0]?.filename ?? null;
+			saveToSession();
 			status = 'ready';
 		} catch (e) {
 			errorMsg = e instanceof Error ? e.message : 'Failed to load PR';

@@ -189,4 +189,23 @@
 		0%, 100% { opacity: 1; }
 		50% { opacity: 0.3; }
 	}
+
+	/* Responsive: on narrow screens stack panels vertically and hide resizers */
+	@media (max-width: 768px) {
+		.workspace {
+			flex-direction: column;
+			overflow-y: auto;
+		}
+		.panel {
+			width: 100% !important;
+			min-width: 0 !important;
+			max-width: 100% !important;
+		}
+		.diff-panel {
+			min-height: 400px;
+		}
+		.status-bar {
+			display: none;
+		}
+	}
 </style>

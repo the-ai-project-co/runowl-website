@@ -33,6 +33,6 @@ export const actions: Actions = {
 			});
 		}
 
-		redirect(303, redirectTo.startsWith('/') ? redirectTo : '/app');
+		redirect(303, redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/app');
 	}
 };

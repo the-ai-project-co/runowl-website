@@ -65,4 +65,8 @@
 		cursor: row-resize;
 		width: 100%;
 	}
+
+	@media (max-width: 768px) {
+		.resizer { display: none; }
+	}
 </style>

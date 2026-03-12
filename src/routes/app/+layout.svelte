@@ -18,6 +18,12 @@
 
 		<div class="app-header-right">
 			<span class="user-email">{data.user?.email ?? ''}</span>
+			<a href="/app/profile" class="profile-link" title="Account settings">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+					<circle cx="12" cy="7" r="4"/>
+				</svg>
+			</a>
 			<form method="POST" action="/api/auth">
 				<button type="submit" class="signout-btn">Sign out</button>
 			</form>
@@ -87,6 +93,14 @@
 		color: var(--text);
 		border-color: var(--text);
 	}
+
+	.profile-link {
+		display: flex;
+		align-items: center;
+		color: var(--muted);
+		transition: color 0.15s;
+	}
+	.profile-link:hover { color: var(--text); }
 
 	.app-main {
 		flex: 1;
