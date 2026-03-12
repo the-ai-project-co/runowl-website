@@ -48,52 +48,52 @@
 		{
 			category: 'Core Review',
 			rows: [
-				{ feature: 'AI code review (P0–P3 severity)',   values: [true,  true,  true,  true] },
-				{ feature: 'Interactive Q&A on findings',       values: [true,  true,  true,  true] },
-				{ feature: 'Surface-level security checks',     values: [true,  true,  true,  true] },
-				{ feature: 'GitHub webhook integration',        values: [true,  true,  true,  true] },
-				{ feature: 'CLI (npx runowl)',                  values: [true,  true,  true,  true] },
-				{ feature: 'GitHub Check Runs',                 values: [false, true,  true,  true] },
+				{ feature: 'AI code review (P0–P3 severity)', values: [true, true, true, true] },
+				{ feature: 'Interactive Q&A on findings', values: [true, true, true, true] },
+				{ feature: 'Surface-level security checks', values: [true, true, true, true] },
+				{ feature: 'GitHub webhook integration', values: [true, true, true, true] },
+				{ feature: 'CLI (npx runowl)', values: [true, true, true, true] },
+				{ feature: 'GitHub Check Runs', values: [false, true, true, true] },
 			],
 		},
 		{
 			category: 'Security & Architecture',
 			rows: [
-				{ feature: 'Full OWASP Top 10 analysis',        values: [false, true,  true,  true] },
-				{ feature: 'SOLID / architecture review',       values: [false, true,  true,  true] },
-				{ feature: 'Race condition detection',          values: [false, true,  true,  true] },
-				{ feature: 'Supply chain analysis',             values: [false, true,  true,  true] },
-				{ feature: 'Deep dependency auditing',          values: [false, false, true,  true] },
+				{ feature: 'Full OWASP Top 10 analysis', values: [false, true, true, true] },
+				{ feature: 'SOLID / architecture review', values: [false, true, true, true] },
+				{ feature: 'Race condition detection', values: [false, true, true, true] },
+				{ feature: 'Supply chain analysis', values: [false, true, true, true] },
+				{ feature: 'Deep dependency auditing', values: [false, false, true, true] },
 			],
 		},
 		{
 			category: 'Testing',
 			rows: [
-				{ feature: 'AI test generation',                values: [false, true,  true,  true] },
-				{ feature: 'Unit & integration test runner',    values: [false, true,  true,  true] },
-				{ feature: 'E2E / Playwright testing',          values: [false, false, true,  true] },
-				{ feature: 'Test result history',               values: [false, false, true,  true] },
+				{ feature: 'AI test generation', values: [false, true, true, true] },
+				{ feature: 'Unit & integration test runner', values: [false, true, true, true] },
+				{ feature: 'E2E / Playwright testing', values: [false, false, true, true] },
+				{ feature: 'Test result history', values: [false, false, true, true] },
 			],
 		},
 		{
 			category: 'Team & Access',
 			rows: [
-				{ feature: 'Unlimited repositories',            values: [false, true,  true,  true] },
-				{ feature: 'Team management & roles',           values: [false, true,  true,  true] },
-				{ feature: 'SSO / SAML',                        values: [false, false, true,  true] },
-				{ feature: 'SCIM provisioning',                 values: [false, false, false, true] },
-				{ feature: 'Audit logs',                        values: [false, false, true,  true] },
+				{ feature: 'Unlimited repositories', values: [false, true, true, true] },
+				{ feature: 'Team management & roles', values: [false, true, true, true] },
+				{ feature: 'SSO / SAML', values: [false, false, true, true] },
+				{ feature: 'SCIM provisioning', values: [false, false, false, true] },
+				{ feature: 'Audit logs', values: [false, false, true, true] },
 			],
 		},
 		{
 			category: 'Deployment & Support',
 			rows: [
-				{ feature: 'Cloud-hosted (SaaS)',               values: [true,  true,  true,  true] },
-				{ feature: 'Self-hosted deployment',            values: [true,  true,  false, true] },
-				{ feature: 'Email support',                     values: [false, true,  true,  true] },
-				{ feature: 'Priority support',                  values: [false, false, true,  true] },
-				{ feature: 'Dedicated SLA',                     values: [false, false, false, true] },
-				{ feature: 'Custom integrations',               values: [false, false, false, true] },
+				{ feature: 'Cloud-hosted (SaaS)', values: [true, true, true, true] },
+				{ feature: 'Self-hosted deployment', values: [true, true, false, true] },
+				{ feature: 'Email support', values: [false, true, true, true] },
+				{ feature: 'Priority support', values: [false, false, true, true] },
+				{ feature: 'Dedicated SLA', values: [false, false, false, true] },
+				{ feature: 'Custom integrations', values: [false, false, false, true] },
 			],
 		},
 	];
@@ -125,14 +125,16 @@
 
 <svelte:head>
 	<title>Pricing — RunOwl</title>
-	<meta name="description" content="Simple, transparent pricing for AI-powered code review. Free for individuals and open-source, with Team, Business, and Enterprise plans." />
+	<meta
+		name="description"
+		content="Simple, transparent pricing for AI-powered code review. Free for individuals and open-source, with Team, Business, and Enterprise plans."
+	/>
 </svelte:head>
 
 <Nav />
 
 <main class="pricing-page">
 	<div class="section-wrap">
-
 		<!-- Header -->
 		<div class="page-header">
 			<span class="label">Pricing</span>
@@ -216,9 +218,11 @@
 
 		<!-- FAQ strip -->
 		<div class="faq-strip">
-			<p>Questions? Email us at <a href="mailto:hello@runowl.ai">hello@runowl.ai</a> — we reply within one business day.</p>
+			<p>
+				Questions? Email us at <a href="mailto:hello@runowl.ai">hello@runowl.ai</a> — we reply within
+				one business day.
+			</p>
 		</div>
-
 	</div>
 </main>
 
@@ -274,52 +278,97 @@
 		border: 1px solid var(--border);
 		border-radius: 12px;
 		padding: 1.75rem;
-		opacity: 0; transform: translateY(20px);
-		transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+		opacity: 0;
+		transform: translateY(20px);
+		transition:
+			opacity 0.5s ease,
+			transform 0.5s ease,
+			border-color 0.2s;
 	}
-	.pricing-card.visible { opacity: 1; transform: translateY(0); }
+	.pricing-card.visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
 	.pricing-card.featured {
 		border-color: var(--accent);
 		box-shadow: 0 0 40px var(--accent-glow);
 	}
-	.pricing-card:not(.featured):hover { border-color: var(--muted); }
+	.pricing-card:not(.featured):hover {
+		border-color: var(--muted);
+	}
 
 	.featured-badge {
-		position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-		background: var(--accent); color: #fff;
-		font-size: 0.7rem; font-weight: 700;
-		padding: 0.2rem 0.75rem; border-radius: 99px;
+		position: absolute;
+		top: -12px;
+		left: 50%;
+		transform: translateX(-50%);
+		background: var(--accent);
+		color: #fff;
+		font-size: 0.7rem;
+		font-weight: 700;
+		padding: 0.2rem 0.75rem;
+		border-radius: 99px;
 		white-space: nowrap;
 	}
 
-	.plan-header { margin-bottom: 1rem; }
-	.plan-name { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
-	.plan-desc { font-size: 0.8rem; color: var(--muted); }
+	.plan-header {
+		margin-bottom: 1rem;
+	}
+	.plan-name {
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--text);
+		margin-bottom: 0.25rem;
+	}
+	.plan-desc {
+		font-size: 0.8rem;
+		color: var(--muted);
+	}
 
 	.plan-price {
-		display: flex; align-items: baseline; gap: 0.35rem;
+		display: flex;
+		align-items: baseline;
+		gap: 0.35rem;
 		margin-bottom: 1.25rem;
 	}
-	.price-amount { font-size: 2rem; font-weight: 800; color: var(--text); }
-	.price-period { font-size: 0.8rem; color: var(--muted); }
+	.price-amount {
+		font-size: 2rem;
+		font-weight: 800;
+		color: var(--text);
+	}
+	.price-period {
+		font-size: 0.8rem;
+		color: var(--muted);
+	}
 
 	.plan-cta {
-		display: block; text-align: center;
-		padding: 0.6rem; border-radius: 8px;
-		font-size: 0.875rem; font-weight: 600;
-		background: var(--surface-2); color: var(--text);
+		display: block;
+		text-align: center;
+		padding: 0.6rem;
+		border-radius: 8px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		background: var(--surface-2);
+		color: var(--text);
 		border: 1px solid var(--border);
 		transition: all 0.2s;
 	}
-	.plan-cta:hover { border-color: var(--muted); }
+	.plan-cta:hover {
+		border-color: var(--muted);
+	}
 	.plan-cta.cta-featured {
-		background: var(--accent); color: #fff;
+		background: var(--accent);
+		color: #fff;
 		border-color: var(--accent);
 	}
-	.plan-cta.cta-featured:hover { opacity: 0.9; }
+	.plan-cta.cta-featured:hover {
+		opacity: 0.9;
+	}
 
 	/* Comparison table */
-	.compare-wrap { margin-bottom: 4rem; }
+	.compare-wrap {
+		margin-bottom: 4rem;
+	}
 
 	.compare-title {
 		font-size: 1.4rem;
@@ -431,5 +480,7 @@
 		text-decoration: underline;
 		text-underline-offset: 3px;
 	}
-	.faq-strip a:hover { opacity: 0.8; }
+	.faq-strip a:hover {
+		opacity: 0.8;
+	}
 </style>

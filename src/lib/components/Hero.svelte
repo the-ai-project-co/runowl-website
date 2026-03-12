@@ -3,7 +3,9 @@
 	import { ArrowRight, Github } from 'lucide-svelte';
 
 	let visible = false;
-	onMount(() => { setTimeout(() => (visible = true), 100); });
+	onMount(() => {
+		setTimeout(() => (visible = true), 100);
+	});
 </script>
 
 <section class="hero">
@@ -23,8 +25,8 @@
 		</h1>
 
 		<p class="hero-sub">
-			RunOwl is an AI agent that reviews GitHub PRs, finds bugs and security issues
-			with severity levels, and posts findings as PR comments — automatically.
+			RunOwl is an AI agent that reviews GitHub PRs, finds bugs and security issues with severity
+			levels, and posts findings as PR comments — automatically.
 		</p>
 
 		<div class="hero-actions">
@@ -77,7 +79,8 @@
 				</div>
 				<div class="spacer"></div>
 				<div class="line output">
-					<span class="cross">✗</span> Check Run failed · <span class="dim">2 blocking findings</span>
+					<span class="cross">✗</span> Check Run failed ·
+					<span class="dim">2 blocking findings</span>
 				</div>
 			</div>
 		</div>
@@ -97,7 +100,8 @@
 	}
 
 	.grid-bg {
-		position: absolute; inset: 0;
+		position: absolute;
+		inset: 0;
 		background-image:
 			linear-gradient(var(--border) 1px, transparent 1px),
 			linear-gradient(90deg, var(--border) 1px, transparent 1px);
@@ -107,18 +111,25 @@
 	}
 
 	.orb {
-		position: absolute; border-radius: 50%;
-		filter: blur(80px); pointer-events: none;
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(80px);
+		pointer-events: none;
 	}
 	.orb-1 {
-		width: 600px; height: 600px;
-		background: radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%);
-		top: -100px; left: 50%; transform: translateX(-50%);
+		width: 600px;
+		height: 600px;
+		background: radial-gradient(circle, rgba(124, 106, 247, 0.12) 0%, transparent 70%);
+		top: -100px;
+		left: 50%;
+		transform: translateX(-50%);
 	}
 	.orb-2 {
-		width: 400px; height: 400px;
-		background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
-		bottom: 0; right: 10%;
+		width: 400px;
+		height: 400px;
+		background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+		bottom: 0;
+		right: 10%;
 	}
 
 	.hero-inner {
@@ -127,23 +138,36 @@
 		margin-left: auto;
 		margin-right: auto;
 		text-align: center;
-		position: relative; z-index: 1;
+		position: relative;
+		z-index: 1;
 		padding: 5rem 1.5rem;
-		opacity: 0; transform: translateY(20px);
-		transition: opacity 0.8s ease, transform 0.8s ease;
+		opacity: 0;
+		transform: translateY(20px);
+		transition:
+			opacity 0.8s ease,
+			transform 0.8s ease;
 	}
-	.hero-inner.visible { opacity: 1; transform: translateY(0); }
+	.hero-inner.visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
 
 	.badge {
-		display: inline-flex; align-items: center; gap: 0.5rem;
-		padding: 0.35rem 1rem; border-radius: 99px;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.35rem 1rem;
+		border-radius: 99px;
 		border: 1px solid var(--border);
 		background: var(--surface);
-		font-size: 0.8rem; color: var(--muted);
+		font-size: 0.8rem;
+		color: var(--muted);
 		margin-bottom: 2rem;
 	}
 	.badge-dot {
-		width: 6px; height: 6px; border-radius: 50%;
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
 		background: var(--green);
 		box-shadow: 0 0 6px var(--green);
 	}
@@ -157,7 +181,10 @@
 		color: var(--text);
 		font-family: 'Inter', sans-serif;
 	}
-	.hero-title em { font-style: normal; color: var(--accent); }
+	.hero-title em {
+		font-style: normal;
+		color: var(--accent);
+	}
 
 	.hero-sub {
 		font-size: 1.15rem;
@@ -168,29 +195,50 @@
 	}
 
 	.hero-actions {
-		display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+		display: flex;
+		gap: 1rem;
+		justify-content: center;
+		flex-wrap: wrap;
 		margin-bottom: 3.5rem;
 	}
 
 	.cta-primary {
-		display: inline-flex; align-items: center; gap: 0.5rem;
-		background: var(--accent); color: #fff;
-		padding: 0.75rem 1.5rem; border-radius: 8px;
-		font-weight: 600; font-size: 0.95rem;
-		transition: transform 0.2s, box-shadow 0.2s;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--accent);
+		color: #fff;
+		padding: 0.75rem 1.5rem;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 0.95rem;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
 		box-shadow: 0 0 30px rgba(124, 106, 247, 0.3);
 	}
-	.cta-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(124, 106, 247, 0.5); }
+	.cta-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 0 40px rgba(124, 106, 247, 0.5);
+	}
 
 	.cta-secondary {
-		display: inline-flex; align-items: center; gap: 0.5rem;
-		background: var(--surface); color: var(--text);
-		padding: 0.75rem 1.5rem; border-radius: 8px;
-		font-weight: 600; font-size: 0.95rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--surface);
+		color: var(--text);
+		padding: 0.75rem 1.5rem;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 0.95rem;
 		border: 1px solid var(--border);
 		transition: all 0.2s;
 	}
-	.cta-secondary:hover { border-color: var(--muted); transform: translateY(-1px); }
+	.cta-secondary:hover {
+		border-color: var(--muted);
+		transform: translateY(-1px);
+	}
 
 	.terminal {
 		background: var(--surface);
@@ -200,20 +248,40 @@
 		text-align: left;
 		max-width: 640px;
 		margin: 0 auto;
-		box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+		box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
 	}
 	.terminal-bar {
 		background: var(--surface-2);
 		padding: 0.75rem 1rem;
-		display: flex; align-items: center; gap: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
 		border-bottom: 1px solid var(--border);
 	}
-	.dots { display: flex; gap: 6px; }
-	.dot { width: 12px; height: 12px; border-radius: 50%; }
-	.dot.red { background: #ff5f57; }
-	.dot.yellow { background: #febc2e; }
-	.dot.green { background: #28c840; }
-	.terminal-title { font-size: 0.8rem; color: var(--muted); flex: 1; text-align: center; }
+	.dots {
+		display: flex;
+		gap: 6px;
+	}
+	.dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+	}
+	.dot.red {
+		background: #ff5f57;
+	}
+	.dot.yellow {
+		background: #febc2e;
+	}
+	.dot.green {
+		background: #28c840;
+	}
+	.terminal-title {
+		font-size: 0.8rem;
+		color: var(--muted);
+		flex: 1;
+		text-align: center;
+	}
 
 	.terminal-body {
 		padding: 1.25rem 1.5rem;
@@ -221,26 +289,64 @@
 		font-size: 0.82rem;
 		line-height: 1.8;
 	}
-	.line { display: flex; gap: 0.5rem; align-items: baseline; }
-	.finding { gap: 0.4rem; }
-	.spacer { height: 0.4rem; }
-	.prompt { color: var(--muted); }
-	.cmd { color: var(--green); }
-	.output { color: var(--muted); }
-	.check { color: var(--green); }
-	.cross { color: var(--red); }
-	.dim { color: var(--border); }
-	.accent { color: var(--accent); }
-	.hi-green { color: var(--green); }
-	.file { color: var(--accent-2); }
-	.fdesc { color: var(--muted); }
+	.line {
+		display: flex;
+		gap: 0.5rem;
+		align-items: baseline;
+	}
+	.finding {
+		gap: 0.4rem;
+	}
+	.spacer {
+		height: 0.4rem;
+	}
+	.prompt {
+		color: var(--muted);
+	}
+	.cmd {
+		color: var(--green);
+	}
+	.output {
+		color: var(--muted);
+	}
+	.check {
+		color: var(--green);
+	}
+	.cross {
+		color: var(--red);
+	}
+	.dim {
+		color: var(--border);
+	}
+	.accent {
+		color: var(--accent);
+	}
+	.hi-green {
+		color: var(--green);
+	}
+	.file {
+		color: var(--accent-2);
+	}
+	.fdesc {
+		color: var(--muted);
+	}
 
 	.sev {
-		font-size: 0.65rem; font-weight: 700;
-		padding: 0.1rem 0.35rem; border-radius: 3px;
-		color: #fff; flex-shrink: 0;
+		font-size: 0.65rem;
+		font-weight: 700;
+		padding: 0.1rem 0.35rem;
+		border-radius: 3px;
+		color: #fff;
+		flex-shrink: 0;
 	}
-	.sev.p0 { background: var(--red); }
-	.sev.p1 { background: var(--yellow); color: #000; }
-	.sev.p2 { background: var(--muted); }
+	.sev.p0 {
+		background: var(--red);
+	}
+	.sev.p1 {
+		background: var(--yellow);
+		color: #000;
+	}
+	.sev.p2 {
+		background: var(--muted);
+	}
 </style>
