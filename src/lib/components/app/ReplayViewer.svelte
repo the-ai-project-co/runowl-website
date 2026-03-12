@@ -28,7 +28,6 @@
 	let { result }: { result: TestResult } = $props();
 
 	let activePanel = $state<'network' | 'console'>('network');
-	let currentMs = $state(0); // synced from VideoPlayer via binding
 
 	const networkEvents = $derived(result.replay_events.filter((e) => e.type === 'network_request'));
 	const consoleEvents = $derived(result.replay_events.filter((e) => e.type === 'console_log'));

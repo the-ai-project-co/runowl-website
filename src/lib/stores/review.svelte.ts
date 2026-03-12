@@ -231,7 +231,7 @@ function createReviewStore() {
 					);
 				}
 			}
-		} catch (e) {
+		} catch {
 			chatMessages = chatMessages.map((m) =>
 				m.id === assistantMsg.id
 					? { ...m, content: 'Failed to get a response. Please try again.' }

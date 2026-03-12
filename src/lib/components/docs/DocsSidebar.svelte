@@ -3,7 +3,6 @@
 		Github,
 		BookOpen,
 		Terminal,
-		Webhook,
 		BrainCircuit,
 		ShieldCheck,
 		Settings,

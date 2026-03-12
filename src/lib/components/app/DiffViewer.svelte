@@ -87,14 +87,6 @@
 	const diffLines = $derived(file?.patch ? parsePatch(file.patch) : []);
 	const splitRows = $derived(viewMode === 'split' ? buildSplitRows(diffLines) : []);
 
-	// Group diffLines into hunks (for collapsible context runs)
-	interface HunkGroup {
-		hunkIndex: number;
-		hunkHeader: DiffLine | null;
-		lines: DiffLine[];
-		contextRunStart: number; // index into lines where a long context run begins
-	}
-
 	function groupIntoHunks(
 		lines: DiffLine[]
 	): Array<{ header: DiffLine | null; lines: DiffLine[]; idx: number }> {
@@ -219,10 +211,6 @@
 						{/if}
 						{#if !isHunkCollapsed(group.idx)}
 							{#each group.lines as line, li}
-								<!-- Collapse long context runs (>COLLAPSE_THRESHOLD consecutive context lines) -->
-								{@const prevIsContext = li > 0 && group.lines[li - 1].type === 'context'}
-								{@const nextIsContext =
-									li < group.lines.length - 1 && group.lines[li + 1].type === 'context'}
 								{#if line.type === 'context'}
 									{@const runStart = (() => {
 										let s = li;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { XCircle, CircleCheck, Webhook, ScanSearch, FileText, CheckCheck } from 'lucide-svelte';
+	import { XCircle, Webhook, ScanSearch, FileText, CheckCheck } from 'lucide-svelte';
 
 	let sectionEl: HTMLElement;
 	let visible = false;
@@ -94,7 +94,7 @@
 					per repo.
 				</p>
 				<div class="gh-steps">
-					{#each ghSteps as step, i}
+					{#each ghSteps as step}
 						<div class="gh-step">
 							<div class="step-circle">
 								<svelte:component this={step.Icon} size={14} />
