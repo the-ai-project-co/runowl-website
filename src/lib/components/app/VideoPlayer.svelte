@@ -39,7 +39,11 @@
 
 	function togglePlay() {
 		if (!videoEl) return;
-		if (playing) { videoEl.pause(); } else { videoEl.play(); }
+		if (playing) {
+			videoEl.pause();
+		} else {
+			videoEl.play();
+		}
 	}
 
 	function seek(e: MouseEvent) {
@@ -63,6 +67,17 @@
 	}
 
 	$effect(() => {
+		// Reset transient state when src changes so a previous error/position doesn't leak
+		src;
+		error = false;
+		loading = true;
+		playing = false;
+		currentTime = 0;
+		duration = 0;
+		if (videoEl) videoEl.load();
+	});
+
+	$effect(() => {
 		// Jump to linked assertion offset when provided
 		if (linkedAssertionMs !== null && videoEl && duration > 0) {
 			videoEl.currentTime = linkedAssertionMs / 1000;
@@ -73,8 +88,20 @@
 <div class="video-player">
 	{#if error}
 		<div class="video-error">
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-				<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+			>
+				<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+					x1="12"
+					y1="16"
+					x2="12.01"
+					y2="16"
+				/>
 			</svg>
 			<p>Unable to load recording.</p>
 		</div>
@@ -86,9 +113,19 @@
 				{src}
 				onplay={() => (playing = true)}
 				onpause={() => (playing = false)}
-				ontimeupdate={() => { if (videoEl) currentTime = videoEl.currentTime; }}
-				onloadedmetadata={() => { if (videoEl) { duration = videoEl.duration; loading = false; } }}
-				onerror={() => { error = true; loading = false; }}
+				ontimeupdate={() => {
+					if (videoEl) currentTime = videoEl.currentTime;
+				}}
+				onloadedmetadata={() => {
+					if (videoEl) {
+						duration = videoEl.duration;
+						loading = false;
+					}
+				}}
+				onerror={() => {
+					error = true;
+					loading = false;
+				}}
 				onwaiting={() => (loading = true)}
 				oncanplay={() => (loading = false)}
 				preload="metadata"
@@ -106,7 +143,7 @@
 				{#if !playing}
 					<span class="play-icon">
 						<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-							<polygon points="5 3 19 12 5 21 5 3"/>
+							<polygon points="5 3 19 12 5 21 5 3" />
 						</svg>
 					</span>
 				{/if}
@@ -126,13 +163,20 @@
 						<button
 							class="marker"
 							style="left: {pct}%;"
-							onclick={(e) => { e.stopPropagation(); seekToMarker(marker.offset_ms); }}
+							onclick={(e) => {
+								e.stopPropagation();
+								seekToMarker(marker.offset_ms);
+							}}
 							title={marker.label}
 						></button>
 					{/each}
 					{#if linkedAssertionMs !== null && duration > 0}
 						{@const pct = (linkedAssertionMs / 1000 / duration) * 100}
-						<div class="marker assertion-marker" style="left: {pct}%;" title="Failing assertion"></div>
+						<div
+							class="marker assertion-marker"
+							style="left: {pct}%;"
+							title="Failing assertion"
+						></div>
 					{/if}
 				</div>
 				<div class="time-labels">
@@ -146,26 +190,53 @@
 				<button class="ctrl-btn" onclick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
 					{#if playing}
 						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-							<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+							<rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" />
 						</svg>
 					{:else}
 						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-							<polygon points="5 3 19 12 5 21 5 3"/>
+							<polygon points="5 3 19 12 5 21 5 3" />
 						</svg>
 					{/if}
 				</button>
 
 				<!-- Seek back 5s -->
-				<button class="ctrl-btn" onclick={() => { if (videoEl) videoEl.currentTime = Math.max(0, currentTime - 5); }} aria-label="-5s">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.7"/>
+				<button
+					class="ctrl-btn"
+					onclick={() => {
+						if (videoEl) videoEl.currentTime = Math.max(0, currentTime - 5);
+					}}
+					aria-label="-5s"
+				>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-4.7" />
 					</svg>
 				</button>
 
 				<!-- Seek forward 5s -->
-				<button class="ctrl-btn" onclick={() => { if (videoEl) videoEl.currentTime = Math.min(duration, currentTime + 5); }} aria-label="+5s">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: scaleX(-1)">
-						<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.7"/>
+				<button
+					class="ctrl-btn"
+					onclick={() => {
+						if (videoEl) videoEl.currentTime = Math.min(duration, currentTime + 5);
+					}}
+					aria-label="+5s"
+				>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						style="transform: scaleX(-1)"
+					>
+						<polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-4.7" />
 					</svg>
 				</button>
 
@@ -207,7 +278,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0,0,0,0.4);
+		background: rgba(0, 0, 0, 0.4);
 	}
 
 	.play-overlay {
@@ -225,7 +296,7 @@
 		display: flex;
 		width: 52px;
 		height: 52px;
-		background: rgba(0,0,0,0.6);
+		background: rgba(0, 0, 0, 0.6);
 		border-radius: 50%;
 		align-items: center;
 		justify-content: center;
@@ -233,17 +304,23 @@
 		opacity: 0;
 		transition: opacity 0.15s;
 	}
-	.video-wrap:hover .play-icon { opacity: 1; }
+	.video-wrap:hover .play-icon {
+		opacity: 1;
+	}
 
 	.spinner-large {
 		width: 32px;
 		height: 32px;
-		border: 3px solid rgba(255,255,255,0.2);
+		border: 3px solid rgba(255, 255, 255, 0.2);
 		border-top-color: #fff;
 		border-radius: 50%;
 		animation: spin 0.7s linear infinite;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	.controls {
 		padding: 0.625rem 0.875rem;
@@ -253,7 +330,11 @@
 		gap: 0.5rem;
 	}
 
-	.progress-wrap { display: flex; flex-direction: column; gap: 0.25rem; }
+	.progress-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
 
 	.progress-track {
 		height: 5px;
@@ -283,7 +364,9 @@
 		cursor: pointer;
 		padding: 0;
 	}
-	.marker:hover { background: #fff; }
+	.marker:hover {
+		background: #fff;
+	}
 
 	.assertion-marker {
 		background: var(--red);
@@ -315,9 +398,14 @@
 		justify-content: center;
 		padding: 0.3rem 0.4rem;
 		border-radius: 5px;
-		transition: color 0.15s, background 0.15s;
+		transition:
+			color 0.15s,
+			background 0.15s;
 	}
-	.ctrl-btn:hover { color: var(--text); background: var(--surface-2); }
+	.ctrl-btn:hover {
+		color: var(--text);
+		background: var(--surface-2);
+	}
 
 	.rate-btn {
 		font-size: 0.72rem;
@@ -336,5 +424,7 @@
 		color: var(--muted);
 		aspect-ratio: 16/9;
 	}
-	.video-error p { font-size: 0.85rem; }
+	.video-error p {
+		font-size: 0.85rem;
+	}
 </style>

@@ -5,10 +5,10 @@
 	const selected = $derived(reviewStore.selectedFile);
 
 	const statusIcon: Record<string, { icon: string; color: string }> = {
-		added:    { icon: 'A', color: 'var(--green)' },
+		added: { icon: 'A', color: 'var(--green)' },
 		modified: { icon: 'M', color: 'var(--yellow)' },
-		removed:  { icon: 'D', color: 'var(--red)' },
-		renamed:  { icon: 'R', color: 'var(--accent)' },
+		removed: { icon: 'D', color: 'var(--red)' },
+		renamed: { icon: 'R', color: 'var(--accent)' },
 	};
 
 	function shortName(filename: string): string {
@@ -101,7 +101,9 @@
 		text-align: left;
 		transition: background 0.1s;
 	}
-	.file-item:hover { background: var(--surface-2); }
+	.file-item:hover {
+		background: var(--surface-2);
+	}
 	.file-item.active {
 		background: var(--accent-glow);
 		border-left: 2px solid var(--accent);
@@ -135,6 +137,10 @@
 		font-size: 0.68rem;
 		font-family: monospace;
 	}
-	.add { color: var(--green); }
-	.del { color: var(--red); }
+	.add {
+		color: var(--green);
+	}
+	.del {
+		color: var(--red);
+	}
 </style>

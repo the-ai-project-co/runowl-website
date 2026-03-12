@@ -45,8 +45,18 @@ describe('chat — SSE chunk parsing', () => {
 describe('chat — message list management', () => {
 	it('appends user message before assistant placeholder', () => {
 		const messages: ChatMessage[] = [];
-		const userMsg: ChatMessage = { id: '1', role: 'user', content: 'Hello?', timestamp: Date.now() };
-		const assistantMsg: ChatMessage = { id: '2', role: 'assistant', content: '', timestamp: Date.now() };
+		const userMsg: ChatMessage = {
+			id: '1',
+			role: 'user',
+			content: 'Hello?',
+			timestamp: Date.now(),
+		};
+		const assistantMsg: ChatMessage = {
+			id: '2',
+			role: 'assistant',
+			content: '',
+			timestamp: Date.now(),
+		};
 		messages.push(userMsg, assistantMsg);
 		expect(messages[0].role).toBe('user');
 		expect(messages[1].role).toBe('assistant');
@@ -60,9 +70,7 @@ describe('chat — message list management', () => {
 			{ id, role: 'assistant', content: '', timestamp: 2 },
 		];
 		const delta = 'Hello ';
-		messages = messages.map((m) =>
-			m.id === id ? { ...m, content: m.content + delta } : m
-		);
+		messages = messages.map((m) => (m.id === id ? { ...m, content: m.content + delta } : m));
 		expect(messages[0].content).toBe('keep');
 		expect(messages[1].content).toBe('Hello ');
 	});
@@ -91,7 +99,10 @@ describe('chat — code selection context', () => {
 
 describe('chat — tab badge counts', () => {
 	type Severity = 'P0' | 'P1' | 'P2' | 'P3';
-	interface Finding { id: string; severity: Severity }
+	interface Finding {
+		id: string;
+		severity: Severity;
+	}
 
 	const findings: Finding[] = [
 		{ id: '1', severity: 'P0' },

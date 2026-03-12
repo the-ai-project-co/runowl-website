@@ -10,9 +10,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const prUrl: string = body?.url ?? '';
 
 	// Validate GitHub PR URL format
-	const match = prUrl.match(
-		/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/
-	);
+	const match = prUrl.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
 	if (!match) {
 		error(400, 'Invalid GitHub PR URL. Expected: https://github.com/owner/repo/pull/123');
 	}
@@ -29,12 +27,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const [metaRes, filesRes] = await Promise.all([
 		fetch(`https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}`, { headers }),
-		fetch(`https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/files?per_page=100`, { headers }),
+		fetch(`https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/files?per_page=100`, {
+			headers,
+		}),
 	]);
 
-	if (metaRes.status === 404) error(404, 'Pull request not found. Check the URL or make sure the repo is public.');
+	if (metaRes.status === 404)
+		error(404, 'Pull request not found. Check the URL or make sure the repo is public.');
 	if (metaRes.status === 403) error(403, 'GitHub rate limit reached. Try again in a minute.');
 	if (!metaRes.ok) error(502, `GitHub API error: ${metaRes.status}`);
+	if (!filesRes.ok) error(502, `GitHub API error (files): ${filesRes.status}`);
 
 	const [meta, files] = await Promise.all([metaRes.json(), filesRes.json()]);
 

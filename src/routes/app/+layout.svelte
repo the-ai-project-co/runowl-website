@@ -25,7 +25,11 @@
 		<a href="/" class="app-logo">
 			<svg width="22" height="22" viewBox="0 0 28 28" fill="none">
 				<circle cx="14" cy="14" r="14" fill="var(--accent)" opacity="0.15" />
-				<path d="M9 10 Q14 6 19 10 Q21 14 19 18 Q14 22 9 18 Q7 14 9 10Z" fill="var(--accent)" opacity="0.6" />
+				<path
+					d="M9 10 Q14 6 19 10 Q21 14 19 18 Q14 22 9 18 Q7 14 9 10Z"
+					fill="var(--accent)"
+					opacity="0.6"
+				/>
 				<circle cx="11.5" cy="13" r="2" fill="var(--accent)" />
 				<circle cx="16.5" cy="13" r="2" fill="var(--accent)" />
 			</svg>
@@ -34,21 +38,62 @@
 
 		<div class="app-header-right">
 			<span class="user-email">{data.user?.email ?? ''}</span>
-			<button class="theme-btn" onclick={toggleTheme} title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} aria-label="Toggle theme">
+			<button
+				class="theme-btn"
+				onclick={toggleTheme}
+				title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+				aria-label="Toggle theme"
+			>
 				{#if theme === 'dark'}
-					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+					<svg
+						width="15"
+						height="15"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line
+							x1="12"
+							y1="21"
+							x2="12"
+							y2="23"
+						/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line
+							x1="18.36"
+							y1="18.36"
+							x2="19.78"
+							y2="19.78"
+						/><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line
+							x1="4.22"
+							y1="19.78"
+							x2="5.64"
+							y2="18.36"
+						/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
 					</svg>
 				{:else}
-					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+					<svg
+						width="15"
+						height="15"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
 					</svg>
 				{/if}
 			</button>
 			<a href="/app/profile" class="profile-link" title="Account settings">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-					<circle cx="12" cy="7" r="4"/>
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+					<circle cx="12" cy="7" r="4" />
 				</svg>
 			</a>
 			<form method="POST" action="/api/auth">
@@ -114,7 +159,9 @@
 		color: var(--muted);
 		cursor: pointer;
 		font-family: inherit;
-		transition: color 0.15s, border-color 0.15s;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
 	}
 	.signout-btn:hover {
 		color: var(--text);
@@ -131,7 +178,9 @@
 		padding: 0;
 		transition: color 0.15s;
 	}
-	.theme-btn:hover { color: var(--text); }
+	.theme-btn:hover {
+		color: var(--text);
+	}
 
 	.profile-link {
 		display: flex;
@@ -139,7 +188,9 @@
 		color: var(--muted);
 		transition: color 0.15s;
 	}
-	.profile-link:hover { color: var(--text); }
+	.profile-link:hover {
+		color: var(--text);
+	}
 
 	.app-main {
 		flex: 1;

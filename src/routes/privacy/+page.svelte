@@ -5,31 +5,32 @@
 
 <svelte:head>
 	<title>Privacy Policy — RunOwl</title>
-	<meta name="description" content="RunOwl's privacy policy — what data we collect, how we use it, and your rights." />
+	<meta
+		name="description"
+		content="RunOwl's privacy policy — what data we collect, how we use it, and your rights."
+	/>
 </svelte:head>
 
 <Nav />
 
 <main class="legal-page">
 	<div class="legal-wrap">
-
 		<div class="legal-header">
 			<span class="label">Privacy</span>
 			<h1>Privacy Policy</h1>
 			<p class="subtitle">
-				We believe privacy is a right, not a feature. This policy explains what data RunOwl collects,
-				why, and how you can control it.
+				We believe privacy is a right, not a feature. This policy explains what data RunOwl
+				collects, why, and how you can control it.
 			</p>
 			<p class="updated">Last updated: March 2026 · Effective: March 2026</p>
 		</div>
 
 		<div class="legal-body">
-
 			<section>
 				<h2>1. Who We Are</h2>
 				<p>
-					RunOwl is operated by <strong>The AI Project Co.</strong> ("we", "us", "our").
-					If you have questions about this policy, contact us at
+					RunOwl is operated by <strong>The AI Project Co.</strong> ("we", "us", "our"). If you have
+					questions about this policy, contact us at
 					<a href="mailto:hello@runowl.ai">hello@runowl.ai</a>.
 				</p>
 			</section>
@@ -39,26 +40,41 @@
 
 				<h3>When you use the free CLI or self-hosted server</h3>
 				<p>
-					RunOwl runs entirely on your machine. We collect <strong>nothing</strong>. Execution traces are
-					stored locally at <code>~/.runowl/traces/</code> and never leave your environment.
-					The only outbound network calls go to GitHub's API and your configured AI provider (Google Gemini or Anthropic).
+					RunOwl runs entirely on your machine. We collect <strong>nothing</strong>. Execution
+					traces are stored locally at <code>~/.runowl/traces/</code> and never leave your environment.
+					The only outbound network calls go to GitHub's API and your configured AI provider (Google Gemini
+					or Anthropic).
 				</p>
 
 				<h3>When you use RunOwl Cloud</h3>
 				<p>We collect the following information:</p>
 				<ul>
-					<li><strong>Account data:</strong> email address, name, and GitHub OAuth identity used to sign in</li>
-					<li><strong>Usage data:</strong> number of reviews run, PR references (owner/repo/number), timestamps</li>
-					<li><strong>Review results:</strong> structured findings (severity, type, description, citation) — never raw source code</li>
-					<li><strong>Billing data:</strong> payment method details are handled by Stripe; we store only a subscription status and invoice history</li>
-					<li><strong>Log data:</strong> server logs including IP address, browser user-agent, and request timestamps, retained for 30 days</li>
+					<li>
+						<strong>Account data:</strong> email address, name, and GitHub OAuth identity used to sign
+						in
+					</li>
+					<li>
+						<strong>Usage data:</strong> number of reviews run, PR references (owner/repo/number), timestamps
+					</li>
+					<li>
+						<strong>Review results:</strong> structured findings (severity, type, description, citation)
+						— never raw source code
+					</li>
+					<li>
+						<strong>Billing data:</strong> payment method details are handled by Stripe; we store only
+						a subscription status and invoice history
+					</li>
+					<li>
+						<strong>Log data:</strong> server logs including IP address, browser user-agent, and request
+						timestamps, retained for 30 days
+					</li>
 				</ul>
 
 				<h3>Source code</h3>
 				<p>
-					<strong>We do not store your source code or PR diffs.</strong> Diffs are fetched from GitHub at review time,
-					sent to the AI provider for analysis, and discarded immediately after the review completes.
-					Only the structured results (findings) are retained.
+					<strong>We do not store your source code or PR diffs.</strong> Diffs are fetched from GitHub
+					at review time, sent to the AI provider for analysis, and discarded immediately after the review
+					completes. Only the structured results (findings) are retained.
 				</p>
 			</section>
 
@@ -68,7 +84,9 @@
 					<li>To provide, operate, and improve the RunOwl service</li>
 					<li>To send transactional emails (review complete, billing receipts)</li>
 					<li>To enforce our Terms of Service and prevent abuse</li>
-					<li>To generate anonymised, aggregated usage statistics (e.g. most common finding types)</li>
+					<li>
+						To generate anonymised, aggregated usage statistics (e.g. most common finding types)
+					</li>
 				</ul>
 				<p>We do not sell your data. We do not use your data to train AI models.</p>
 			</section>
@@ -77,18 +95,31 @@
 				<h2>4. Data Sharing</h2>
 				<p>We share data only with:</p>
 				<ul>
-					<li><strong>AI providers</strong> (Google Gemini, Anthropic Claude) — PR diffs sent for analysis; subject to their privacy policies</li>
-					<li><strong>GitHub</strong> — to post review comments and create Check Runs on your behalf</li>
+					<li>
+						<strong>AI providers</strong> (Google Gemini, Anthropic Claude) — PR diffs sent for analysis;
+						subject to their privacy policies
+					</li>
+					<li>
+						<strong>GitHub</strong> — to post review comments and create Check Runs on your behalf
+					</li>
 					<li><strong>Stripe</strong> — to process payments; they receive billing data only</li>
-					<li><strong>Infrastructure providers</strong> (cloud hosting, CDN) — under data processing agreements</li>
+					<li>
+						<strong>Infrastructure providers</strong> (cloud hosting, CDN) — under data processing agreements
+					</li>
 				</ul>
-				<p>We will disclose data to law enforcement only when required by law and, where legally permitted, will notify you first.</p>
+				<p>
+					We will disclose data to law enforcement only when required by law and, where legally
+					permitted, will notify you first.
+				</p>
 			</section>
 
 			<section>
 				<h2>5. Data Retention</h2>
 				<ul>
-					<li>Review results: retained for the duration of your subscription, then deleted within 30 days of account closure</li>
+					<li>
+						Review results: retained for the duration of your subscription, then deleted within 30
+						days of account closure
+					</li>
 					<li>Account data: deleted within 30 days of account closure</li>
 					<li>Server logs: deleted after 30 days</li>
 					<li>Billing records: retained for 7 years as required by tax law</li>
@@ -106,16 +137,16 @@
 					<li>Data portability — receive your data in a machine-readable format</li>
 				</ul>
 				<p>
-					To exercise any of these rights, email <a href="mailto:hello@runowl.ai">hello@runowl.ai</a>.
-					We will respond within 30 days.
+					To exercise any of these rights, email <a href="mailto:hello@runowl.ai">hello@runowl.ai</a
+					>. We will respond within 30 days.
 				</p>
 			</section>
 
 			<section>
 				<h2>7. Cookies</h2>
 				<p>
-					The RunOwl website uses only essential cookies required for authentication and session management.
-					We do not use advertising or tracking cookies.
+					The RunOwl website uses only essential cookies required for authentication and session
+					management. We do not use advertising or tracking cookies.
 				</p>
 			</section>
 
@@ -130,27 +161,28 @@
 			<section>
 				<h2>9. Children</h2>
 				<p>
-					RunOwl is not directed at children under 16. We do not knowingly collect data from anyone under 16.
-					If you believe we have collected data from a child, please contact us immediately.
+					RunOwl is not directed at children under 16. We do not knowingly collect data from anyone
+					under 16. If you believe we have collected data from a child, please contact us
+					immediately.
 				</p>
 			</section>
 
 			<section>
 				<h2>10. Changes to This Policy</h2>
 				<p>
-					We may update this policy from time to time. When we do, we will update the "Last updated" date above
-					and, for material changes, notify you by email or via an in-app notice at least 14 days in advance.
+					We may update this policy from time to time. When we do, we will update the "Last updated"
+					date above and, for material changes, notify you by email or via an in-app notice at least
+					14 days in advance.
 				</p>
 			</section>
 
 			<section>
 				<h2>Contact</h2>
 				<p>
-					<strong>The AI Project Co.</strong><br/>
+					<strong>The AI Project Co.</strong><br />
 					<a href="mailto:hello@runowl.ai">hello@runowl.ai</a>
 				</p>
 			</section>
-
 		</div>
 	</div>
 </main>

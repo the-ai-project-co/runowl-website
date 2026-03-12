@@ -21,8 +21,8 @@
 
 	const hasData = $derived(
 		reviewStore.status === 'ready' ||
-		reviewStore.status === 'reviewing' ||
-		reviewStore.status === 'done'
+			reviewStore.status === 'reviewing' ||
+			reviewStore.status === 'done'
 	);
 
 	// Handle resize events from Resizer components
@@ -186,8 +186,13 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.3; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.3;
+		}
 	}
 
 	/* Responsive: on narrow screens stack panels vertically and hide resizers */

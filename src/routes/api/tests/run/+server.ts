@@ -10,14 +10,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!body?.url) error(400, 'url is required');
 
 	const backendUrl = process.env.RUNOWL_BACKEND_URL ?? 'http://localhost:8000';
+
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), 10000);
+
 	const res = await fetch(`${backendUrl}/tests/run`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
+		signal: controller.signal,
 		body: JSON.stringify(body),
-	}).catch(() => null);
+	})
+		.catch(() => null)
+		.finally(() => clearTimeout(timeout));
 
 	if (!res) error(502, 'RunOwl backend is unreachable');
-	if (!res.ok) error(res.status as 400, 'Backend error');
+	if (!res.ok) error(res.status, 'Backend error');
 
 	return json(await res.json());
 };

@@ -30,8 +30,18 @@
 		<form onsubmit={handleSubmit} class="loader-form">
 			<div class="input-row">
 				<div class="input-wrap" class:has-error={!!inputError}>
-					<svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+					<svg
+						class="input-icon"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+						/>
 					</svg>
 					<input
 						type="url"
@@ -59,8 +69,20 @@
 
 			{#if reviewStore.status === 'error'}
 				<div class="api-error" role="alert">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+							x1="12"
+							y1="16"
+							x2="12.01"
+							y2="16"
+						/>
 					</svg>
 					{reviewStore.errorMsg}
 				</div>
@@ -77,7 +99,13 @@
 
 		<div class="examples">
 			<span class="examples-label">Try an example:</span>
-			<button class="example-pill" onclick={() => { inputUrl = 'https://github.com/sveltejs/kit/pull/1'; inputError = ''; }}>
+			<button
+				class="example-pill"
+				onclick={() => {
+					inputUrl = 'https://github.com/sveltejs/kit/pull/1';
+					inputError = '';
+				}}
+			>
 				sveltejs/kit#1
 			</button>
 		</div>
@@ -145,15 +173,25 @@
 		color: var(--text);
 		outline: none;
 		font-family: 'SF Mono', 'Fira Code', monospace;
-		transition: border-color 0.15s, box-shadow 0.15s;
+		transition:
+			border-color 0.15s,
+			box-shadow 0.15s;
 	}
-	input::placeholder { color: var(--muted); opacity: 0.5; }
+	input::placeholder {
+		color: var(--muted);
+		opacity: 0.5;
+	}
 	input:focus {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 3px var(--accent-glow);
 	}
-	input:disabled { opacity: 0.5; cursor: not-allowed; }
-	.has-error input { border-color: var(--red); }
+	input:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.has-error input {
+		border-color: var(--red);
+	}
 
 	.btn-review {
 		padding: 0 1.25rem;
@@ -171,18 +209,27 @@
 		font-family: inherit;
 		transition: opacity 0.15s;
 	}
-	.btn-review:hover:not(:disabled) { opacity: 0.88; }
-	.btn-review:disabled { opacity: 0.5; cursor: not-allowed; }
+	.btn-review:hover:not(:disabled) {
+		opacity: 0.88;
+	}
+	.btn-review:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 
 	.spinner {
 		width: 13px;
 		height: 13px;
-		border: 2px solid rgba(255,255,255,0.3);
+		border: 2px solid rgba(255, 255, 255, 0.3);
 		border-top-color: #fff;
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	.field-error {
 		margin-top: 0.4rem;
@@ -195,15 +242,18 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 0.5rem;
-		background: rgba(248,113,113,0.08);
-		border: 1px solid rgba(248,113,113,0.2);
+		background: rgba(248, 113, 113, 0.08);
+		border: 1px solid rgba(248, 113, 113, 0.2);
 		border-radius: 8px;
 		padding: 0.65rem 0.875rem;
 		font-size: 0.83rem;
 		color: var(--red);
 		line-height: 1.5;
 	}
-	.api-error svg { flex-shrink: 0; margin-top: 1px; }
+	.api-error svg {
+		flex-shrink: 0;
+		margin-top: 1px;
+	}
 
 	/* Skeleton loaders */
 	.loading-skeleton {
@@ -217,13 +267,28 @@
 		background: var(--surface);
 		border-radius: 6px;
 		animation: shimmer 1.4s ease infinite;
-		background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+		background: linear-gradient(
+			90deg,
+			var(--surface) 25%,
+			var(--surface-2) 50%,
+			var(--surface) 75%
+		);
 		background-size: 200% 100%;
 	}
-	.skel-wide { width: 100%; }
-	.skel-med  { width: 72%; }
-	.skel-short { width: 48%; }
-	@keyframes shimmer { to { background-position: -200% 0; } }
+	.skel-wide {
+		width: 100%;
+	}
+	.skel-med {
+		width: 72%;
+	}
+	.skel-short {
+		width: 48%;
+	}
+	@keyframes shimmer {
+		to {
+			background-position: -200% 0;
+		}
+	}
 
 	.examples {
 		display: flex;
@@ -244,7 +309,9 @@
 		color: var(--muted);
 		cursor: pointer;
 		font-family: monospace;
-		transition: color 0.15s, border-color 0.15s;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
 	}
 	.example-pill:hover {
 		color: var(--accent);

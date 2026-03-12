@@ -5,9 +5,9 @@ const config = {
 	kit: {
 		adapter: adapter({ runtime: 'nodejs22.x' }),
 		prerender: {
-			handleMissingId: 'warn'
-		}
-	}
+			handleMissingId: 'warn',
+		},
+	},
 };
 
 export default config;

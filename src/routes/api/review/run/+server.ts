@@ -14,16 +14,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const backendUrl = process.env.RUNOWL_BACKEND_URL ?? 'http://localhost:8000';
 
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), 15000);
+
 	const res = await fetch(`${backendUrl}/review`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
+		signal: controller.signal,
 		body: JSON.stringify({ url: prUrl, ...(model ? { model } : {}) }),
-	}).catch(() => null);
+	})
+		.catch(() => null)
+		.finally(() => clearTimeout(timeout));
 
 	if (!res) error(502, 'RunOwl backend is unreachable');
 	if (!res.ok) {
 		const detail = await res.json().catch(() => ({ detail: res.statusText }));
-		error(res.status as 400, detail.detail ?? 'Backend error');
+		error(res.status, detail.detail ?? 'Backend error');
 	}
 
 	return json(await res.json());

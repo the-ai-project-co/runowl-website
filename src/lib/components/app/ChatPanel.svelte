@@ -78,8 +78,16 @@
 		<div class="messages" bind:this={messagesEl} role="log" aria-live="polite">
 			{#if messages.length === 0}
 				<div class="empty-chat">
-					<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
-						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+					<svg
+						width="32"
+						height="32"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						opacity="0.3"
+					>
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
 					</svg>
 					<p>Ask anything about this PR</p>
 					<p class="empty-hint">e.g. "Are there race conditions?" or "Explain the caching logic"</p>
@@ -90,9 +98,13 @@
 						{#if msg.role === 'assistant'}
 							<div class="msg-avatar">
 								<svg width="14" height="14" viewBox="0 0 28 28" fill="none">
-									<path d="M9 10 Q14 6 19 10 Q21 14 19 18 Q14 22 9 18 Q7 14 9 10Z" fill="var(--accent)" opacity="0.7"/>
-									<circle cx="11.5" cy="13" r="1.5" fill="var(--accent)"/>
-									<circle cx="16.5" cy="13" r="1.5" fill="var(--accent)"/>
+									<path
+										d="M9 10 Q14 6 19 10 Q21 14 19 18 Q14 22 9 18 Q7 14 9 10Z"
+										fill="var(--accent)"
+										opacity="0.7"
+									/>
+									<circle cx="11.5" cy="13" r="1.5" fill="var(--accent)" />
+									<circle cx="16.5" cy="13" r="1.5" fill="var(--accent)" />
 								</svg>
 							</div>
 						{/if}
@@ -117,10 +129,22 @@
 				disabled={streaming}
 				rows="1"
 			></textarea>
-			<button type="submit" class="send-btn" disabled={!input.trim() || streaming} aria-label="Send">
-				<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-					<line x1="22" y1="2" x2="11" y2="13"/>
-					<polygon points="22 2 15 22 11 13 2 9 22 2"/>
+			<button
+				type="submit"
+				class="send-btn"
+				disabled={!input.trim() || streaming}
+				aria-label="Send"
+			>
+				<svg
+					width="15"
+					height="15"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+				>
+					<line x1="22" y1="2" x2="11" y2="13" />
+					<polygon points="22 2 15 22 11 13 2 9 22 2" />
 				</svg>
 			</button>
 		</form>
@@ -131,8 +155,15 @@
 					{#if reviewStore.status !== 'done'}
 						<p>Run a review to see flags.</p>
 					{:else}
-						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5">
-							<polyline points="20 6 9 17 4 12"/>
+						<svg
+							width="28"
+							height="28"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="var(--green)"
+							stroke-width="1.5"
+						>
+							<polyline points="20 6 9 17 4 12" />
 						</svg>
 						<p>No flags found</p>
 					{/if}
@@ -141,7 +172,12 @@
 				{#each flags as f (f.id)}
 					<button class="finding-card" onclick={() => reviewStore.highlightFinding(f)}>
 						<div class="finding-header">
-							<span class="sev-pill" style="color: {sevColor[f.severity] ?? 'var(--muted)'}; border-color: {sevColor[f.severity] ?? 'var(--border)'};">
+							<span
+								class="sev-pill"
+								style="color: {sevColor[f.severity] ?? 'var(--muted)'}; border-color: {sevColor[
+									f.severity
+								] ?? 'var(--border)'};"
+							>
 								{f.severity}
 							</span>
 							<span class="finding-type">{f.type}</span>
@@ -159,8 +195,15 @@
 					{#if reviewStore.status !== 'done'}
 						<p>Run a review to see bugs.</p>
 					{:else}
-						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5">
-							<polyline points="20 6 9 17 4 12"/>
+						<svg
+							width="28"
+							height="28"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="var(--green)"
+							stroke-width="1.5"
+						>
+							<polyline points="20 6 9 17 4 12" />
 						</svg>
 						<p>No bugs found</p>
 					{/if}
@@ -169,7 +212,12 @@
 				{#each bugs as f (f.id)}
 					<button class="finding-card bug" onclick={() => reviewStore.highlightFinding(f)}>
 						<div class="finding-header">
-							<span class="sev-pill" style="color: {sevColor[f.severity] ?? 'var(--red)'}; border-color: {sevColor[f.severity] ?? 'var(--red)'};">
+							<span
+								class="sev-pill"
+								style="color: {sevColor[f.severity] ?? 'var(--red)'}; border-color: {sevColor[
+									f.severity
+								] ?? 'var(--red)'};"
+							>
 								{f.severity}
 							</span>
 							<span class="finding-type">{f.type}</span>
@@ -218,13 +266,17 @@
 		color: var(--muted);
 		cursor: pointer;
 		font-family: inherit;
-		transition: color 0.15s, border-color 0.15s;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
 	}
 	.tab-bar button.active {
 		color: var(--text);
 		border-bottom-color: var(--accent);
 	}
-	.tab-bar button:hover:not(.active) { color: var(--text); }
+	.tab-bar button:hover:not(.active) {
+		color: var(--text);
+	}
 
 	.tab-badge {
 		font-size: 0.65rem;
@@ -232,8 +284,14 @@
 		padding: 0.05rem 0.35rem;
 		border-radius: 99px;
 	}
-	.tab-badge.bug { background: rgba(248,113,113,0.15); color: var(--red); }
-	.tab-badge.flag { background: rgba(251,191,36,0.12); color: var(--yellow); }
+	.tab-badge.bug {
+		background: rgba(248, 113, 113, 0.15);
+		color: var(--red);
+	}
+	.tab-badge.flag {
+		background: rgba(251, 191, 36, 0.12);
+		color: var(--yellow);
+	}
 
 	/* Messages */
 	.messages {
@@ -255,21 +313,29 @@
 		gap: 0.5rem;
 		padding: 2rem 0;
 	}
-	.empty-chat p { font-size: 0.83rem; color: var(--muted); }
-	.empty-hint { font-size: 0.75rem; opacity: 0.6; }
+	.empty-chat p {
+		font-size: 0.83rem;
+		color: var(--muted);
+	}
+	.empty-hint {
+		font-size: 0.75rem;
+		opacity: 0.6;
+	}
 
 	.message {
 		display: flex;
 		gap: 0.5rem;
 		align-items: flex-start;
 	}
-	.message.user { flex-direction: row-reverse; }
+	.message.user {
+		flex-direction: row-reverse;
+	}
 
 	.msg-avatar {
 		width: 26px;
 		height: 26px;
 		background: var(--accent-glow);
-		border: 1px solid rgba(124,106,247,0.2);
+		border: 1px solid rgba(124, 106, 247, 0.2);
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -316,11 +382,21 @@
 		border-radius: 50%;
 		animation: bounce 1.2s ease infinite;
 	}
-	.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-	.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+	.typing-dots span:nth-child(2) {
+		animation-delay: 0.2s;
+	}
+	.typing-dots span:nth-child(3) {
+		animation-delay: 0.4s;
+	}
 	@keyframes bounce {
-		0%, 80%, 100% { transform: translateY(0); }
-		40% { transform: translateY(-6px); }
+		0%,
+		80%,
+		100% {
+			transform: translateY(0);
+		}
+		40% {
+			transform: translateY(-6px);
+		}
 	}
 
 	/* Chat input */
@@ -347,15 +423,22 @@
 		min-height: 36px;
 		max-height: 120px;
 		overflow-y: auto;
-		transition: border-color 0.15s, box-shadow 0.15s;
+		transition:
+			border-color 0.15s,
+			box-shadow 0.15s;
 		line-height: 1.5;
 	}
-	textarea::placeholder { color: var(--muted); opacity: 0.5; }
+	textarea::placeholder {
+		color: var(--muted);
+		opacity: 0.5;
+	}
 	textarea:focus {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 3px var(--accent-glow);
 	}
-	textarea:disabled { opacity: 0.5; }
+	textarea:disabled {
+		opacity: 0.5;
+	}
 
 	.send-btn {
 		width: 34px;
@@ -371,8 +454,13 @@
 		flex-shrink: 0;
 		transition: opacity 0.15s;
 	}
-	.send-btn:hover:not(:disabled) { opacity: 0.88; }
-	.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.send-btn:hover:not(:disabled) {
+		opacity: 0.88;
+	}
+	.send-btn:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
 
 	/* Findings list (Flags / Bugs tabs) */
 	.findings-list {
@@ -393,7 +481,10 @@
 		padding: 3rem 1rem;
 		text-align: center;
 	}
-	.empty-findings p { font-size: 0.83rem; color: var(--muted); }
+	.empty-findings p {
+		font-size: 0.83rem;
+		color: var(--muted);
+	}
 
 	.finding-card {
 		width: 100%;
@@ -404,10 +495,17 @@
 		padding: 0.625rem 0.75rem;
 		cursor: pointer;
 		font-family: inherit;
-		transition: border-color 0.15s, background 0.1s;
+		transition:
+			border-color 0.15s,
+			background 0.1s;
 	}
-	.finding-card:hover { border-color: var(--accent); background: var(--accent-glow); }
-	.finding-card.bug { border-left: 3px solid var(--red); }
+	.finding-card:hover {
+		border-color: var(--accent);
+		background: var(--accent-glow);
+	}
+	.finding-card.bug {
+		border-left: 3px solid var(--red);
+	}
 
 	.finding-header {
 		display: flex;

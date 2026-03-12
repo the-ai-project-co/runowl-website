@@ -10,7 +10,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
 		const form = await request.formData();
-		const email = String(form.get('email') ?? '').trim().toLowerCase();
+		const email = String(form.get('email') ?? '')
+			.trim()
+			.toLowerCase();
 		const password = String(form.get('password') ?? '');
 		const confirmPassword = String(form.get('confirmPassword') ?? '');
 
@@ -28,15 +30,15 @@ export const actions: Actions = {
 			email,
 			password,
 			options: {
-				emailRedirectTo: 'https://runowl.ai/app'
-			}
+				emailRedirectTo: 'https://runowl.ai/app',
+			},
 		});
 
 		if (error) {
 			if (error.message.toLowerCase().includes('already registered')) {
 				return fail(400, {
 					error: 'An account with this email already exists.',
-					email
+					email,
 				});
 			}
 			return fail(400, { error: 'Could not create account. Please try again.', email });
@@ -44,5 +46,5 @@ export const actions: Actions = {
 
 		// Supabase sends a confirmation email — show the success state
 		return { success: true, email };
-	}
+	},
 };

@@ -25,8 +25,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	};
 	if (githubToken) headers['Authorization'] = `Bearer ${githubToken}`;
 
+	const encodedPath = path.split('/').map(encodeURIComponent).join('/');
 	const res = await fetch(
-		`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${ref}`,
+		`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`,
 		{ headers }
 	);
 
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	const content =
 		data.encoding === 'base64'
 			? Buffer.from(data.content, 'base64').toString('utf-8')
-			: data.content ?? '';
+			: (data.content ?? '');
 
 	return json({ path, ref, content, size: data.size ?? 0 });
 };

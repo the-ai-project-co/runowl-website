@@ -10,7 +10,11 @@
 	<a href="/" class="auth-logo">
 		<svg width="28" height="28" viewBox="0 0 28 28" fill="none">
 			<circle cx="14" cy="14" r="14" fill="var(--accent)" opacity="0.15" />
-			<path d="M9 10 Q14 6 19 10 Q21 14 19 18 Q14 22 9 18 Q7 14 9 10Z" fill="var(--accent)" opacity="0.6" />
+			<path
+				d="M9 10 Q14 6 19 10 Q21 14 19 18 Q14 22 9 18 Q7 14 9 10Z"
+				fill="var(--accent)"
+				opacity="0.6"
+			/>
 			<circle cx="11.5" cy="13" r="2" fill="var(--accent)" />
 			<circle cx="16.5" cy="13" r="2" fill="var(--accent)" />
 		</svg>
@@ -36,8 +40,11 @@
 		justify-content: center;
 		padding: 2rem 1.5rem;
 		background: var(--bg);
-		background-image:
-			radial-gradient(ellipse 60% 40% at 50% 0%, rgba(124, 106, 247, 0.08) 0%, transparent 70%);
+		background-image: radial-gradient(
+			ellipse 60% 40% at 50% 0%,
+			rgba(124, 106, 247, 0.08) 0%,
+			transparent 70%
+		);
 	}
 
 	.auth-logo {

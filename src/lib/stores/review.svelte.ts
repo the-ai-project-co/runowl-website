@@ -97,7 +97,9 @@ function createReviewStore() {
 		if (typeof sessionStorage === 'undefined') return;
 		try {
 			sessionStorage.setItem(CACHE_KEY, JSON.stringify({ prUrl, meta, files }));
-		} catch { /* quota exceeded — ignore */ }
+		} catch {
+			/* quota exceeded — ignore */
+		}
 	}
 
 	function loadFromSession(url: string): boolean {
@@ -111,7 +113,9 @@ function createReviewStore() {
 			files = cached.files;
 			selectedFile = files[0]?.filename ?? null;
 			return true;
-		} catch { return false; }
+		} catch {
+			return false;
+		}
 	}
 
 	async function loadPR(url: string) {
@@ -244,7 +248,9 @@ function createReviewStore() {
 			if (!res.ok) return;
 			const data = await res.json();
 			testSuite = data as TestSuiteResult;
-		} catch { /* silently ignore */ }
+		} catch {
+			/* silently ignore */
+		}
 	}
 
 	function selectFile(filename: string) {
@@ -259,22 +265,54 @@ function createReviewStore() {
 	}
 
 	return {
-		get prUrl() { return prUrl; },
-		get status() { return status; },
-		get errorMsg() { return errorMsg; },
-		get meta() { return meta; },
-		get files() { return files; },
-		get selectedFile() { return selectedFile; },
-		get selectedFileData() { return selectedFileData; },
-		get findings() { return findings; },
-		get flags() { return flags; },
-		get bugs() { return bugs; },
-		get chatMessages() { return chatMessages; },
-		get streaming() { return streaming; },
-		get activeTab() { return activeTab; },
-		get highlightedLine() { return highlightedLine; },
-		get testSuite() { return testSuite; },
-		set activeTab(v: 'review' | 'flags' | 'bugs') { activeTab = v; },
+		get prUrl() {
+			return prUrl;
+		},
+		get status() {
+			return status;
+		},
+		get errorMsg() {
+			return errorMsg;
+		},
+		get meta() {
+			return meta;
+		},
+		get files() {
+			return files;
+		},
+		get selectedFile() {
+			return selectedFile;
+		},
+		get selectedFileData() {
+			return selectedFileData;
+		},
+		get findings() {
+			return findings;
+		},
+		get flags() {
+			return flags;
+		},
+		get bugs() {
+			return bugs;
+		},
+		get chatMessages() {
+			return chatMessages;
+		},
+		get streaming() {
+			return streaming;
+		},
+		get activeTab() {
+			return activeTab;
+		},
+		get highlightedLine() {
+			return highlightedLine;
+		},
+		get testSuite() {
+			return testSuite;
+		},
+		set activeTab(v: 'review' | 'flags' | 'bugs') {
+			activeTab = v;
+		},
 		reset,
 		loadPR,
 		runReview,

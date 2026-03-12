@@ -16,16 +16,21 @@
 	}
 
 	const stateColor = $derived(
-		meta?.state === 'open' ? 'var(--green)'
-		: meta?.state === 'merged' ? 'var(--accent)'
-		: 'var(--red)'
+		meta?.state === 'open'
+			? 'var(--green)'
+			: meta?.state === 'merged'
+				? 'var(--accent)'
+				: 'var(--red)'
 	);
 
 	const reviewStatusLabel = $derived(
-		status === 'reviewing' ? 'Running review…'
-		: status === 'done' ? 'Review complete'
-		: status === 'ready' ? 'Ready to review'
-		: ''
+		status === 'reviewing'
+			? 'Running review…'
+			: status === 'done'
+				? 'Review complete'
+				: status === 'ready'
+					? 'Ready to review'
+					: ''
 	);
 </script>
 
@@ -38,11 +43,18 @@
 			aria-label={collapsed ? 'Expand panel' : 'Collapse panel'}
 			title={collapsed ? 'Expand' : 'Collapse'}
 		>
-			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<svg
+				width="14"
+				height="14"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
 				{#if collapsed}
-					<polyline points="9 18 15 12 9 6"/>
+					<polyline points="9 18 15 12 9 6" />
 				{:else}
-					<polyline points="15 18 9 12 15 6"/>
+					<polyline points="15 18 9 12 15 6" />
 				{/if}
 			</svg>
 		</button>
@@ -58,20 +70,35 @@
 
 			<!-- Title -->
 			<a href={meta.url} target="_blank" rel="noopener" class="pr-title">
-				#{meta.number} {meta.title}
+				#{meta.number}
+				{meta.title}
 			</a>
 
 			<!-- Meta row -->
 			<div class="meta-row">
 				<span class="meta-item">
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
 					</svg>
 					{meta.author}
 				</span>
 				<span class="meta-item">
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
 					</svg>
 					{timeAgo(meta.created_at)}
 				</span>
@@ -80,8 +107,15 @@
 			<!-- Branch info -->
 			<div class="branch-row">
 				<code class="branch">{meta.head_branch}</code>
-				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+				<svg
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
 				</svg>
 				<code class="branch">{meta.base_branch}</code>
 			</div>
@@ -122,8 +156,15 @@
 					{#if status === 'reviewing'}
 						<span class="status-dot reviewing"></span>
 					{:else if status === 'done'}
-						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5">
-							<polyline points="20 6 9 17 4 12"/>
+						<svg
+							width="13"
+							height="13"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="var(--green)"
+							stroke-width="2.5"
+						>
+							<polyline points="20 6 9 17 4 12" />
 						</svg>
 					{:else}
 						<span class="status-dot ready"></span>
@@ -135,8 +176,15 @@
 			<!-- Run review button -->
 			{#if status === 'ready'}
 				<button class="btn-run-review" onclick={() => reviewStore.runReview()}>
-					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<polygon points="5 3 19 12 5 21 5 3"/>
+					<svg
+						width="13"
+						height="13"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<polygon points="5 3 19 12 5 21 5 3" />
 					</svg>
 					Run AI Review
 				</button>
@@ -146,10 +194,14 @@
 			{#if status === 'done'}
 				<div class="findings-summary">
 					{#if reviewStore.bugs.length}
-						<span class="badge bug-badge">{reviewStore.bugs.length} bug{reviewStore.bugs.length !== 1 ? 's' : ''}</span>
+						<span class="badge bug-badge"
+							>{reviewStore.bugs.length} bug{reviewStore.bugs.length !== 1 ? 's' : ''}</span
+						>
 					{/if}
 					{#if reviewStore.flags.length}
-						<span class="badge flag-badge">{reviewStore.flags.length} flag{reviewStore.flags.length !== 1 ? 's' : ''}</span>
+						<span class="badge flag-badge"
+							>{reviewStore.flags.length} flag{reviewStore.flags.length !== 1 ? 's' : ''}</span
+						>
 					{/if}
 					{#if !reviewStore.bugs.length && !reviewStore.flags.length}
 						<span class="badge clean-badge">No issues found</span>
@@ -162,8 +214,17 @@
 				{@const ts = reviewStore.testSuite}
 				<div class="test-status">
 					<div class="test-status-header">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+						<svg
+							width="12"
+							height="12"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<polyline points="9 11 12 14 22 4" /><path
+								d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+							/>
 						</svg>
 						<span>Tests</span>
 						{#if ts.all_passed}
@@ -206,7 +267,9 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		transition: width 0.2s ease, min-width 0.2s ease;
+		transition:
+			width 0.2s ease,
+			min-width 0.2s ease;
 	}
 	.pr-summary.collapsed {
 		width: 36px;
@@ -230,7 +293,9 @@
 		white-space: nowrap;
 		overflow: hidden;
 	}
-	.collapsed .summary-title { opacity: 0; }
+	.collapsed .summary-title {
+		opacity: 0;
+	}
 
 	.collapse-btn {
 		background: none;
@@ -243,7 +308,9 @@
 		flex-shrink: 0;
 		transition: color 0.15s;
 	}
-	.collapse-btn:hover { color: var(--text); }
+	.collapse-btn:hover {
+		color: var(--text);
+	}
 
 	.summary-body {
 		padding: 0.875rem;
@@ -276,7 +343,9 @@
 		line-height: 1.45;
 		text-decoration: none;
 	}
-	.pr-title:hover { color: var(--accent); }
+	.pr-title:hover {
+		color: var(--accent);
+	}
 
 	.meta-row {
 		display: flex;
@@ -345,8 +414,12 @@
 		display: flex;
 		background: var(--border);
 	}
-	.diff-add { background: var(--green); }
-	.diff-del { background: var(--red); }
+	.diff-add {
+		background: var(--green);
+	}
+	.diff-del {
+		background: var(--red);
+	}
 
 	.review-status {
 		display: flex;
@@ -369,8 +442,13 @@
 		background: var(--accent);
 	}
 	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.4; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
 	}
 
 	.btn-run-review {
@@ -390,7 +468,9 @@
 		font-family: inherit;
 		transition: opacity 0.15s;
 	}
-	.btn-run-review:hover { opacity: 0.88; }
+	.btn-run-review:hover {
+		opacity: 0.88;
+	}
 
 	.findings-summary {
 		display: flex;
@@ -403,9 +483,21 @@
 		padding: 0.2rem 0.5rem;
 		border-radius: 99px;
 	}
-	.bug-badge { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
-	.flag-badge { background: rgba(251,191,36,0.1); color: var(--yellow); border: 1px solid rgba(251,191,36,0.2); }
-	.clean-badge { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+	.bug-badge {
+		background: rgba(248, 113, 113, 0.12);
+		color: var(--red);
+		border: 1px solid rgba(248, 113, 113, 0.2);
+	}
+	.flag-badge {
+		background: rgba(251, 191, 36, 0.1);
+		color: var(--yellow);
+		border: 1px solid rgba(251, 191, 36, 0.2);
+	}
+	.clean-badge {
+		background: rgba(74, 222, 128, 0.1);
+		color: var(--green);
+		border: 1px solid rgba(74, 222, 128, 0.2);
+	}
 
 	.pr-body {
 		font-size: 0.8rem;

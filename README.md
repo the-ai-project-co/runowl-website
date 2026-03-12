@@ -6,14 +6,14 @@ Marketing site and documentation for [RunOwl](https://github.com/the-ai-project-
 
 ## Stack
 
-| Tool | Version | Purpose |
-|---|---|---|
-| SvelteKit | 2.x | Framework |
-| Svelte | 5.x | UI (runes API) |
-| Tailwind CSS | 4.x | Styling |
-| TypeScript | 5.x | Types |
-| Vite | 6.x | Build tool |
-| `@sveltejs/adapter-vercel` | latest | Deployment |
+| Tool                       | Version | Purpose        |
+| -------------------------- | ------- | -------------- |
+| SvelteKit                  | 2.x     | Framework      |
+| Svelte                     | 5.x     | UI (runes API) |
+| Tailwind CSS               | 4.x     | Styling        |
+| TypeScript                 | 5.x     | Types          |
+| Vite                       | 6.x     | Build tool     |
+| `@sveltejs/adapter-vercel` | latest  | Deployment     |
 
 ---
 
@@ -99,16 +99,16 @@ runowl-website/
 
 ## Docs Pages
 
-| Route | Description |
-|---|---|
-| `/docs/getting-started` | Installation, quick start, first review |
-| `/docs/cli-reference` | All CLI flags and commands |
-| `/docs/github-integration` | Webhook setup, GitHub App, Check Runs |
-| `/docs/how-it-works` | RLM architecture, Deno sandbox, Gemini |
-| `/docs/security-analysis` | Surface and deep security checks |
-| `/docs/configuration` | All environment variables |
-| `/docs/self-hosting` | Docker, systemd, nginx, SSL |
-| `/docs/api-reference` | REST API endpoints |
+| Route                      | Description                             |
+| -------------------------- | --------------------------------------- |
+| `/docs/getting-started`    | Installation, quick start, first review |
+| `/docs/cli-reference`      | All CLI flags and commands              |
+| `/docs/github-integration` | Webhook setup, GitHub App, Check Runs   |
+| `/docs/how-it-works`       | RLM architecture, Deno sandbox, Gemini  |
+| `/docs/security-analysis`  | Surface and deep security checks        |
+| `/docs/configuration`      | All environment variables               |
+| `/docs/self-hosting`       | Docker, systemd, nginx, SSL             |
+| `/docs/api-reference`      | REST API endpoints                      |
 
 ---
 

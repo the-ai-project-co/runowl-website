@@ -11,7 +11,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, url }) => {
 		const form = await request.formData();
-		const email = String(form.get('email') ?? '').trim().toLowerCase();
+		const email = String(form.get('email') ?? '')
+			.trim()
+			.toLowerCase();
 		const password = String(form.get('password') ?? '');
 		const redirectTo = url.searchParams.get('redirectTo') ?? '/app';
 
@@ -29,10 +31,10 @@ export const actions: Actions = {
 			// Don't leak whether the account exists
 			return fail(401, {
 				error: 'Invalid email or password.',
-				email
+				email,
 			});
 		}
 
 		redirect(303, redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/app');
-	}
+	},
 };

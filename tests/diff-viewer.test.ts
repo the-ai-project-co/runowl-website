@@ -18,7 +18,10 @@ function parsePatch(patch: string): DiffLine[] {
 	for (const line of lines) {
 		if (line.startsWith('@@')) {
 			const m = line.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
-			if (m) { oldNo = parseInt(m[1]) - 1; newNo = parseInt(m[2]) - 1; }
+			if (m) {
+				oldNo = parseInt(m[1]) - 1;
+				newNo = parseInt(m[2]) - 1;
+			}
 			result.push({ type: 'hunk', oldNo: null, newNo: null, content: line });
 		} else if (line.startsWith('+')) {
 			newNo++;
@@ -27,7 +30,8 @@ function parsePatch(patch: string): DiffLine[] {
 			oldNo++;
 			result.push({ type: 'remove', oldNo, newNo: null, content: line.slice(1) });
 		} else {
-			oldNo++; newNo++;
+			oldNo++;
+			newNo++;
 			result.push({ type: 'context', oldNo, newNo, content: line.slice(1) });
 		}
 	}
@@ -50,7 +54,9 @@ describe('diff viewer — parsePatch', () => {
 
 	it('parses context line with correct line numbers', () => {
 		const lines = parsePatch(SAMPLE_PATCH);
-		const context = lines.find((l) => l.type === 'context' && l.content.trim() === "import foo from 'foo';");
+		const context = lines.find(
+			(l) => l.type === 'context' && l.content.trim() === "import foo from 'foo';"
+		);
 		expect(context).toBeDefined();
 		expect(context!.oldNo).toBe(1);
 		expect(context!.newNo).toBe(1);
@@ -109,10 +115,10 @@ describe('diff viewer — collapse threshold logic', () => {
 
 describe('diff viewer — file status detection', () => {
 	const statusIcon: Record<string, { icon: string; color: string }> = {
-		added:    { icon: 'A', color: 'var(--green)' },
+		added: { icon: 'A', color: 'var(--green)' },
 		modified: { icon: 'M', color: 'var(--yellow)' },
-		removed:  { icon: 'D', color: 'var(--red)' },
-		renamed:  { icon: 'R', color: 'var(--accent)' },
+		removed: { icon: 'D', color: 'var(--red)' },
+		renamed: { icon: 'R', color: 'var(--accent)' },
 	};
 
 	it('maps added status correctly', () => {

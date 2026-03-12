@@ -24,7 +24,8 @@ function validateInviteBody(body: unknown): string | null {
 	const { email, role } = body as Record<string, unknown>;
 	if (!email || typeof email !== 'string') return 'email is required.';
 	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email as string)) return 'Valid email is required.';
-	if (role !== undefined && !['member', 'admin'].includes(role as string)) return 'Role must be member or admin.';
+	if (role !== undefined && !['member', 'admin'].includes(role as string))
+		return 'Role must be member or admin.';
 	return null;
 }
 
@@ -56,14 +57,18 @@ describe('API — POST /api/review/ask validation', () => {
 	});
 
 	it('rejects blank question', () => {
-		expect(validateReviewAskBody({ url: 'https://github.com/org/repo/pull/1', question: '   ' })).toBeTruthy();
+		expect(
+			validateReviewAskBody({ url: 'https://github.com/org/repo/pull/1', question: '   ' })
+		).toBeTruthy();
 	});
 
 	it('accepts valid body', () => {
-		expect(validateReviewAskBody({
-			url: 'https://github.com/org/repo/pull/1',
-			question: 'Are there race conditions?',
-		})).toBeNull();
+		expect(
+			validateReviewAskBody({
+				url: 'https://github.com/org/repo/pull/1',
+				question: 'Are there race conditions?',
+			})
+		).toBeNull();
 	});
 });
 

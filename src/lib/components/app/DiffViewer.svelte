@@ -50,11 +50,13 @@
 	function isHighlighted(line: DiffLine): boolean {
 		if (!highlightedLine || !file) return false;
 		if (highlightedLine.file !== file.filename) return false;
-		return (line.newNo === highlightedLine.line || line.oldNo === highlightedLine.line);
+		return line.newNo === highlightedLine.line || line.oldNo === highlightedLine.line;
 	}
 
 	// Split view: separate add/context (right) from remove/context (left)
-	function buildSplitRows(diffLines: DiffLine[]): Array<{ left: DiffLine | null; right: DiffLine | null }> {
+	function buildSplitRows(
+		diffLines: DiffLine[]
+	): Array<{ left: DiffLine | null; right: DiffLine | null }> {
 		const rows: Array<{ left: DiffLine | null; right: DiffLine | null }> = [];
 		let i = 0;
 		while (i < diffLines.length) {
@@ -93,7 +95,9 @@
 		contextRunStart: number; // index into lines where a long context run begins
 	}
 
-	function groupIntoHunks(lines: DiffLine[]): Array<{ header: DiffLine | null; lines: DiffLine[]; idx: number }> {
+	function groupIntoHunks(
+		lines: DiffLine[]
+	): Array<{ header: DiffLine | null; lines: DiffLine[]; idx: number }> {
 		const groups: Array<{ header: DiffLine | null; lines: DiffLine[]; idx: number }> = [];
 		let current: { header: DiffLine | null; lines: DiffLine[]; idx: number } | null = null;
 		let idx = 0;
@@ -115,10 +119,16 @@
 	// How many consecutive context lines to collapse
 	const COLLAPSE_THRESHOLD = 6;
 
-	function isHunkCollapsed(idx: number) { return collapsedHunks.has(idx); }
+	function isHunkCollapsed(idx: number) {
+		return collapsedHunks.has(idx);
+	}
 	function toggleHunk(idx: number) {
 		const next = new Set(collapsedHunks);
-		if (next.has(idx)) { next.delete(idx); } else { next.add(idx); }
+		if (next.has(idx)) {
+			next.delete(idx);
+		} else {
+			next.add(idx);
+		}
 		collapsedHunks = next;
 	}
 
@@ -151,7 +161,11 @@
 		{#if file}
 			<div class="file-path">
 				<code>{file.filename}</code>
-				<span class="file-status" class:added={file.status === 'added'} class:removed={file.status === 'removed'}>
+				<span
+					class="file-status"
+					class:added={file.status === 'added'}
+					class:removed={file.status === 'removed'}
+				>
 					{file.status}
 				</span>
 			</div>
@@ -162,13 +176,13 @@
 				<button
 					class:active={viewMode === 'unified'}
 					onclick={() => (viewMode = 'unified')}
-					title="Unified diff"
-				>Unified</button>
+					title="Unified diff">Unified</button
+				>
 				<button
 					class:active={viewMode === 'split'}
 					onclick={() => (viewMode = 'split')}
-					title="Split diff"
-				>Split</button>
+					title="Split diff">Split</button
+				>
 			</div>
 		</div>
 	</div>
@@ -207,17 +221,27 @@
 							{#each group.lines as line, li}
 								<!-- Collapse long context runs (>COLLAPSE_THRESHOLD consecutive context lines) -->
 								{@const prevIsContext = li > 0 && group.lines[li - 1].type === 'context'}
-								{@const nextIsContext = li < group.lines.length - 1 && group.lines[li + 1].type === 'context'}
+								{@const nextIsContext =
+									li < group.lines.length - 1 && group.lines[li + 1].type === 'context'}
 								{#if line.type === 'context'}
-									{@const runStart = (() => { let s = li; while (s > 0 && group.lines[s - 1].type === 'context') s--; return s; })()}
-									{@const runEnd = (() => { let e = li; while (e < group.lines.length - 1 && group.lines[e + 1].type === 'context') e++; return e; })()}
+									{@const runStart = (() => {
+										let s = li;
+										while (s > 0 && group.lines[s - 1].type === 'context') s--;
+										return s;
+									})()}
+									{@const runEnd = (() => {
+										let e = li;
+										while (e < group.lines.length - 1 && group.lines[e + 1].type === 'context') e++;
+										return e;
+									})()}
 									{@const runLen = runEnd - runStart + 1}
 									{@const posInRun = li - runStart}
 									{#if runLen > COLLAPSE_THRESHOLD && posInRun >= 3 && posInRun < runLen - 3}
 										{#if posInRun === 3}
 											<tr class="diff-row collapsed-context">
 												<td colspan="4" class="collapsed-banner">
-													<button onclick={() => {}}>··· {runLen - 6} unchanged lines hidden</button>
+													<button onclick={() => {}}>··· {runLen - 6} unchanged lines hidden</button
+													>
 												</td>
 											</tr>
 										{/if}
@@ -241,7 +265,9 @@
 						{:else}
 							<tr class="diff-row collapsed-context">
 								<td colspan="4" class="collapsed-banner">
-									<button onclick={() => toggleHunk(group.idx)}>··· {group.lines.length} lines — click to expand</button>
+									<button onclick={() => toggleHunk(group.idx)}
+										>··· {group.lines.length} lines — click to expand</button
+									>
 								</td>
 							</tr>
 						{/if}
@@ -252,10 +278,10 @@
 			<!-- Split view -->
 			<table class="diff-table split">
 				<colgroup>
-					<col style="width: 40px"/>
-					<col style="width: 50%"/>
-					<col style="width: 40px"/>
-					<col style="width: 50%"/>
+					<col style="width: 40px" />
+					<col style="width: 50%" />
+					<col style="width: 40px" />
+					<col style="width: 50%" />
 				</colgroup>
 				<tbody>
 					{#each splitRows as row}
@@ -266,12 +292,20 @@
 						{:else}
 							<tr class="diff-row">
 								<td class="ln ln-old">{row.left?.oldNo ?? ''}</td>
-								<td class="diff-code {row.left?.type ?? ''}" class:highlighted={row.left ? isHighlighted(row.left) : false}>
-									{#if row.left}<pre>{row.left.type === 'remove' ? '-' : ' '}{row.left.content}</pre>{/if}
+								<td
+									class="diff-code {row.left?.type ?? ''}"
+									class:highlighted={row.left ? isHighlighted(row.left) : false}
+								>
+									{#if row.left}<pre>{row.left.type === 'remove' ? '-' : ' '}{row.left
+												.content}</pre>{/if}
 								</td>
 								<td class="ln ln-new">{row.right?.newNo ?? ''}</td>
-								<td class="diff-code {row.right?.type ?? ''}" class:highlighted={row.right ? isHighlighted(row.right) : false}>
-									{#if row.right}<pre>{row.right.type === 'add' ? '+' : ' '}{row.right.content}</pre>{/if}
+								<td
+									class="diff-code {row.right?.type ?? ''}"
+									class:highlighted={row.right ? isHighlighted(row.right) : false}
+								>
+									{#if row.right}<pre>{row.right.type === 'add' ? '+' : ' '}{row.right
+												.content}</pre>{/if}
 								</td>
 							</tr>
 						{/if}
@@ -285,13 +319,28 @@
 	{#if selectionContext}
 		<div class="selection-popup">
 			<span class="selection-hint">
-				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+				<svg
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
 				</svg>
-				{selectionContext.split('\n').length} line{selectionContext.split('\n').length !== 1 ? 's' : ''} selected
+				{selectionContext.split('\n').length} line{selectionContext.split('\n').length !== 1
+					? 's'
+					: ''} selected
 			</span>
 			<button class="selection-ask-btn" onclick={askAboutSelection}>Ask AI about this</button>
-			<button class="selection-dismiss" onclick={() => { selectionContext = null; }} aria-label="Dismiss">×</button>
+			<button
+				class="selection-dismiss"
+				onclick={() => {
+					selectionContext = null;
+				}}
+				aria-label="Dismiss">×</button
+			>
 		</div>
 	{/if}
 </div>
@@ -342,10 +391,21 @@
 		color: var(--muted);
 		flex-shrink: 0;
 	}
-	.file-status.added { background: rgba(74,222,128,0.1); color: var(--green); }
-	.file-status.removed { background: rgba(248,113,113,0.1); color: var(--red); }
+	.file-status.added {
+		background: rgba(74, 222, 128, 0.1);
+		color: var(--green);
+	}
+	.file-status.removed {
+		background: rgba(248, 113, 113, 0.1);
+		color: var(--red);
+	}
 
-	.toolbar-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+	.toolbar-right {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-shrink: 0;
+	}
 
 	.view-toggle {
 		display: flex;
@@ -362,13 +422,17 @@
 		color: var(--muted);
 		cursor: pointer;
 		font-family: inherit;
-		transition: color 0.15s, background 0.15s;
+		transition:
+			color 0.15s,
+			background 0.15s;
 	}
 	.view-toggle button.active {
 		background: var(--accent);
 		color: #fff;
 	}
-	.view-toggle button:not(.active):hover { color: var(--text); }
+	.view-toggle button:not(.active):hover {
+		color: var(--text);
+	}
 
 	.diff-body {
 		flex: 1;
@@ -392,19 +456,40 @@
 		line-height: 1.6;
 	}
 
-	.diff-row { transition: background 0.1s; }
-	.diff-row:hover td { background: rgba(255,255,255,0.02); }
-	.diff-row.highlighted td { background: rgba(124,106,247,0.12) !important; }
-	.diff-row.highlighted .ln { border-left: 2px solid var(--accent) !important; }
+	.diff-row {
+		transition: background 0.1s;
+	}
+	.diff-row:hover td {
+		background: rgba(255, 255, 255, 0.02);
+	}
+	.diff-row.highlighted td {
+		background: rgba(124, 106, 247, 0.12) !important;
+	}
+	.diff-row.highlighted .ln {
+		border-left: 2px solid var(--accent) !important;
+	}
 
-	.diff-row.add td { background: rgba(74,222,128,0.06); }
-	.diff-row.remove td { background: rgba(248,113,113,0.06); }
-	.diff-row.hunk td { background: rgba(56,189,248,0.06); color: var(--accent-2); }
+	.diff-row.add td {
+		background: rgba(74, 222, 128, 0.06);
+	}
+	.diff-row.remove td {
+		background: rgba(248, 113, 113, 0.06);
+	}
+	.diff-row.hunk td {
+		background: rgba(56, 189, 248, 0.06);
+		color: var(--accent-2);
+	}
 
 	/* Split view cell-level coloring */
-	td.add { background: rgba(74,222,128,0.06); }
-	td.remove { background: rgba(248,113,113,0.06); }
-	td.highlighted { background: rgba(124,106,247,0.12) !important; }
+	td.add {
+		background: rgba(74, 222, 128, 0.06);
+	}
+	td.remove {
+		background: rgba(248, 113, 113, 0.06);
+	}
+	td.highlighted {
+		background: rgba(124, 106, 247, 0.12) !important;
+	}
 
 	.ln {
 		width: 40px;
@@ -428,8 +513,12 @@
 		vertical-align: top;
 		color: inherit;
 	}
-	.diff-row.add .diff-sign { color: var(--green); }
-	.diff-row.remove .diff-sign { color: var(--red); }
+	.diff-row.add .diff-sign {
+		color: var(--green);
+	}
+	.diff-row.remove .diff-sign {
+		color: var(--red);
+	}
 
 	.diff-code {
 		padding: 0 0.875rem;
@@ -448,7 +537,9 @@
 		padding: 0;
 	}
 
-	.hunk-header pre { color: var(--accent-2); }
+	.hunk-header pre {
+		color: var(--accent-2);
+	}
 
 	.collapse-hunk-btn {
 		margin-left: 0.75rem;
@@ -461,11 +552,18 @@
 		cursor: pointer;
 		font-family: inherit;
 		vertical-align: middle;
-		transition: border-color 0.15s, color 0.15s;
+		transition:
+			border-color 0.15s,
+			color 0.15s;
 	}
-	.collapse-hunk-btn:hover { border-color: var(--accent); color: var(--accent); }
+	.collapse-hunk-btn:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
 
-	.collapsed-context { background: var(--surface); }
+	.collapsed-context {
+		background: var(--surface);
+	}
 	.collapsed-banner {
 		padding: 0;
 		text-align: center;
@@ -479,9 +577,14 @@
 		font-size: 0.72rem;
 		font-family: monospace;
 		cursor: pointer;
-		transition: color 0.15s, background 0.15s;
+		transition:
+			color 0.15s,
+			background 0.15s;
 	}
-	.collapsed-banner button:hover { color: var(--accent); background: var(--accent-glow); }
+	.collapsed-banner button:hover {
+		color: var(--accent);
+		background: var(--accent-glow);
+	}
 
 	.selection-popup {
 		position: sticky;
@@ -494,10 +597,19 @@
 		padding: 0.5rem 0.875rem;
 		background: var(--surface);
 		border-top: 1px solid var(--border);
-		box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
+		box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
 		animation: slideUp 0.15s ease;
 	}
-	@keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+	@keyframes slideUp {
+		from {
+			transform: translateY(8px);
+			opacity: 0;
+		}
+		to {
+			transform: none;
+			opacity: 1;
+		}
+	}
 
 	.selection-hint {
 		display: flex;
@@ -521,7 +633,9 @@
 		white-space: nowrap;
 		transition: opacity 0.15s;
 	}
-	.selection-ask-btn:hover { opacity: 0.88; }
+	.selection-ask-btn:hover {
+		opacity: 0.88;
+	}
 
 	.selection-dismiss {
 		background: none;
@@ -533,5 +647,7 @@
 		padding: 0.1rem 0.25rem;
 		border-radius: 4px;
 	}
-	.selection-dismiss:hover { color: var(--text); }
+	.selection-dismiss:hover {
+		color: var(--text);
+	}
 </style>

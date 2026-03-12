@@ -26,11 +26,6 @@ export default [
 		},
 	},
 	{
-		ignores: [
-			'.svelte-kit/**',
-			'.vercel/**',
-			'node_modules/**',
-			'build/**',
-		],
+		ignores: ['.svelte-kit/**', '.vercel/**', 'node_modules/**', 'build/**'],
 	},
 ];

@@ -30,14 +30,11 @@
 	let activePanel = $state<'network' | 'console'>('network');
 	let currentMs = $state(0); // synced from VideoPlayer via binding
 
-	const networkEvents = $derived(
-		result.replay_events.filter((e) => e.type === 'network_request')
-	);
-	const consoleEvents = $derived(
-		result.replay_events.filter((e) => e.type === 'console_log')
-	);
+	const networkEvents = $derived(result.replay_events.filter((e) => e.type === 'network_request'));
+	const consoleEvents = $derived(result.replay_events.filter((e) => e.type === 'console_log'));
 	const linkedAssertionMs = $derived(
-		result.replay_events.find((e) => e.linked_assertion_id)?.offset_ms ?? null
+		result.replay_events.find((e) => e.type === 'assertion' && e.linked_assertion_id)?.offset_ms ??
+			null
 	);
 
 	const markers = $derived(
@@ -89,15 +86,26 @@
 		<!-- Left: Video player -->
 		<div class="video-column">
 			{#if result.video_path}
-				<VideoPlayer
-					src={result.video_path}
-					{markers}
-					{linkedAssertionMs}
-				/>
+				<VideoPlayer src={result.video_path} {markers} {linkedAssertionMs} />
 			{:else}
 				<div class="no-video">
-					<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
-						<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+					<svg
+						width="32"
+						height="32"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						opacity="0.3"
+					>
+						<polygon points="23 7 16 12 23 17 23 7" /><rect
+							x="1"
+							y="5"
+							width="15"
+							height="14"
+							rx="2"
+							ry="2"
+						/>
 					</svg>
 					<p>No recording available</p>
 				</div>
@@ -157,25 +165,24 @@
 							<div class="net-row" class:linked={!!ev.linked_assertion_id}>
 								<span class="net-method" style="color: {methodColor(method)};">{method}</span>
 								<span class="net-url" title={url}>{url.replace(/^https?:\/\/[^/]+/, '')}</span>
-								<span class="net-status" style="color: {statusColor(status)};">{status || '—'}</span>
+								<span class="net-status" style="color: {statusColor(status)};">{status || '—'}</span
+								>
 								<span class="net-dur">{duration ? formatMs(duration) : ''}</span>
 							</div>
 						{/each}
 					{/if}
+				{:else if consoleEvents.length === 0}
+					<div class="side-empty">No console output captured.</div>
 				{:else}
-					{#if consoleEvents.length === 0}
-						<div class="side-empty">No console output captured.</div>
-					{:else}
-						{#each consoleEvents as ev}
-							{@const level = String(ev.detail.level ?? 'log')}
-							{@const message = String(ev.detail.message ?? '')}
-							<div class="console-row" class:linked={!!ev.linked_assertion_id}>
-								<span class="console-level" style="color: {consoleColor(level)};">{level}</span>
-								<span class="console-msg">{message}</span>
-								<span class="console-time">{formatMs(ev.offset_ms)}</span>
-							</div>
-						{/each}
-					{/if}
+					{#each consoleEvents as ev}
+						{@const level = String(ev.detail.level ?? 'log')}
+						{@const message = String(ev.detail.message ?? '')}
+						<div class="console-row" class:linked={!!ev.linked_assertion_id}>
+							<span class="console-level" style="color: {consoleColor(level)};">{level}</span>
+							<span class="console-msg">{message}</span>
+							<span class="console-time">{formatMs(ev.offset_ms)}</span>
+						</div>
+					{/each}
 				{/if}
 			</div>
 		</div>
@@ -213,7 +220,9 @@
 		border-radius: 50%;
 		background: var(--green);
 	}
-	.status-dot.failed { background: var(--red); }
+	.status-dot.failed {
+		background: var(--red);
+	}
 
 	.test-name {
 		font-size: 0.82rem;
@@ -256,7 +265,9 @@
 		background: var(--surface);
 		color: var(--muted);
 	}
-	.no-video p { font-size: 0.82rem; }
+	.no-video p {
+		font-size: 0.82rem;
+	}
 
 	.step-timeline {
 		padding: 0.75rem 0.875rem;
@@ -318,7 +329,9 @@
 		color: var(--muted);
 		cursor: pointer;
 		font-family: inherit;
-		transition: color 0.15s, border-color 0.15s;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
 	}
 	.side-tabs button.active {
 		color: var(--text);
@@ -348,17 +361,22 @@
 		font-size: 0.82rem;
 	}
 
-	.net-row, .console-row {
+	.net-row,
+	.console-row {
 		display: flex;
 		align-items: baseline;
 		gap: 0.4rem;
 		padding: 0.3rem 0.75rem;
-		border-bottom: 1px solid rgba(255,255,255,0.03);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 		transition: background 0.1s;
 	}
-	.net-row:hover, .console-row:hover { background: var(--surface); }
-	.net-row.linked, .console-row.linked {
-		background: rgba(248,113,113,0.06);
+	.net-row:hover,
+	.console-row:hover {
+		background: var(--surface);
+	}
+	.net-row.linked,
+	.console-row.linked {
+		background: rgba(248, 113, 113, 0.06);
 		border-left: 2px solid var(--red);
 		padding-left: calc(0.75rem - 2px);
 	}
@@ -376,10 +394,37 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
-	.net-status { min-width: 28px; text-align: right; flex-shrink: 0; }
-	.net-dur { color: var(--muted); opacity: 0.6; min-width: 36px; text-align: right; flex-shrink: 0; }
+	.net-status {
+		min-width: 28px;
+		text-align: right;
+		flex-shrink: 0;
+	}
+	.net-dur {
+		color: var(--muted);
+		opacity: 0.6;
+		min-width: 36px;
+		text-align: right;
+		flex-shrink: 0;
+	}
 
-	.console-level { min-width: 32px; font-weight: 700; font-size: 0.68rem; flex-shrink: 0; }
-	.console-msg { flex: 1; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.console-time { color: var(--muted); opacity: 0.5; min-width: 40px; text-align: right; flex-shrink: 0; }
+	.console-level {
+		min-width: 32px;
+		font-weight: 700;
+		font-size: 0.68rem;
+		flex-shrink: 0;
+	}
+	.console-msg {
+		flex: 1;
+		color: var(--muted);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.console-time {
+		color: var(--muted);
+		opacity: 0.5;
+		min-width: 40px;
+		text-align: right;
+		flex-shrink: 0;
+	}
 </style>

@@ -22,12 +22,13 @@
 	<DocsSidebar {currentPath} bind:mobileOpen />
 
 	{#if mobileOpen}
-		<button class="backdrop" on:click={() => mobileOpen = false} aria-label="Close sidebar"></button>
+		<button class="backdrop" on:click={() => (mobileOpen = false)} aria-label="Close sidebar"
+		></button>
 	{/if}
 
 	<div class="docs-body">
 		<header class="mobile-header">
-			<button class="menu-btn" on:click={() => mobileOpen = !mobileOpen} aria-label="Toggle menu">
+			<button class="menu-btn" on:click={() => (mobileOpen = !mobileOpen)} aria-label="Toggle menu">
 				{#if mobileOpen}
 					<X size={18} />
 				{:else}
@@ -55,12 +56,17 @@
 
 	.backdrop {
 		display: none;
-		position: fixed; inset: 0; z-index: 99;
-		background: rgba(0,0,0,0.5);
-		border: none; cursor: pointer;
+		position: fixed;
+		inset: 0;
+		z-index: 99;
+		background: rgba(0, 0, 0, 0.5);
+		border: none;
+		cursor: pointer;
 	}
 	@media (max-width: 768px) {
-		.backdrop { display: block; }
+		.backdrop {
+			display: block;
+		}
 	}
 
 	.docs-body {
@@ -78,23 +84,41 @@
 		height: 3.5rem;
 		border-bottom: 1px solid var(--border);
 		background: var(--surface);
-		position: sticky; top: 0; z-index: 50;
+		position: sticky;
+		top: 0;
+		z-index: 50;
 	}
-	@media (max-width: 768px) { .mobile-header { display: flex; } }
+	@media (max-width: 768px) {
+		.mobile-header {
+			display: flex;
+		}
+	}
 
 	.menu-btn {
-		background: none; border: 1px solid var(--border);
-		border-radius: 6px; width: 32px; height: 32px;
-		display: flex; align-items: center; justify-content: center;
-		color: var(--muted); cursor: pointer;
+		background: none;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--muted);
+		cursor: pointer;
 	}
 	.mobile-logo {
-		font-weight: 700; font-size: 1rem; color: var(--text);
+		font-weight: 700;
+		font-size: 1rem;
+		color: var(--text);
 		text-decoration: none;
 	}
-	.mobile-logo span { color: var(--accent); }
+	.mobile-logo span {
+		color: var(--accent);
+	}
 	.mobile-docs-label {
-		margin-left: auto; font-size: 0.8rem; color: var(--muted);
+		margin-left: auto;
+		font-size: 0.8rem;
+		color: var(--muted);
 		text-decoration: none;
 	}
 
@@ -110,6 +134,8 @@
 	}
 
 	@media (max-width: 640px) {
-		.docs-content { padding: 2rem 1.25rem 4rem; }
+		.docs-content {
+			padding: 2rem 1.25rem 4rem;
+		}
 	}
 </style>

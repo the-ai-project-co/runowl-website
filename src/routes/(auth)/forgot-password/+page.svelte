@@ -13,9 +13,16 @@
 {#if form?.success}
 	<div class="success-state">
 		<div class="success-icon">
-			<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-				<polyline points="22,6 12,13 2,6"/>
+			<svg
+				width="28"
+				height="28"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+				<polyline points="22,6 12,13 2,6" />
 			</svg>
 		</div>
 		<h2>Check your email</h2>
@@ -97,7 +104,9 @@
 		margin-bottom: 1.25rem;
 	}
 
-	.field { margin-bottom: 1.1rem; }
+	.field {
+		margin-bottom: 1.1rem;
+	}
 	label {
 		display: block;
 		font-size: 0.8rem;
@@ -115,15 +124,23 @@
 		font-size: 0.9rem;
 		color: var(--text);
 		outline: none;
-		transition: border-color 0.15s, box-shadow 0.15s;
+		transition:
+			border-color 0.15s,
+			box-shadow 0.15s;
 		font-family: inherit;
 	}
-	input::placeholder { color: var(--muted); opacity: 0.6; }
+	input::placeholder {
+		color: var(--muted);
+		opacity: 0.6;
+	}
 	input:focus {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 3px var(--accent-glow);
 	}
-	input:disabled { opacity: 0.5; cursor: not-allowed; }
+	input:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 
 	.btn-primary {
 		width: 100%;
@@ -140,11 +157,20 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-		transition: opacity 0.15s, transform 0.1s;
+		transition:
+			opacity 0.15s,
+			transform 0.1s;
 		font-family: inherit;
 	}
-	.btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-	.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+	.btn-primary:hover:not(:disabled) {
+		opacity: 0.9;
+		transform: translateY(-1px);
+	}
+	.btn-primary:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		transform: none;
+	}
 
 	.spinner {
 		width: 14px;
@@ -154,17 +180,28 @@
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	.switch-link {
 		margin-top: 1.25rem;
 		text-align: center;
 		font-size: 0.85rem;
 	}
-	.switch-link a { color: var(--muted); }
-	.switch-link a:hover { color: var(--accent); }
+	.switch-link a {
+		color: var(--muted);
+	}
+	.switch-link a:hover {
+		color: var(--accent);
+	}
 
-	.success-state { text-align: center; padding: 0.5rem 0; }
+	.success-state {
+		text-align: center;
+		padding: 0.5rem 0;
+	}
 	.success-icon {
 		width: 56px;
 		height: 56px;
@@ -189,7 +226,9 @@
 		line-height: 1.6;
 		margin-bottom: 1.5rem;
 	}
-	.success-state strong { color: var(--text); }
+	.success-state strong {
+		color: var(--text);
+	}
 	.btn-secondary {
 		display: inline-flex;
 		align-items: center;
@@ -203,5 +242,7 @@
 		text-decoration: none;
 		transition: border-color 0.15s;
 	}
-	.btn-secondary:hover { border-color: var(--accent); }
+	.btn-secondary:hover {
+		border-color: var(--accent);
+	}
 </style>

@@ -10,16 +10,18 @@
 
 	// Password strength
 	let password = $state('');
-	const strength = $derived((() => {
-		if (!password) return 0;
-		let score = 0;
-		if (password.length >= 8) score++;
-		if (password.length >= 12) score++;
-		if (/[A-Z]/.test(password)) score++;
-		if (/[0-9]/.test(password)) score++;
-		if (/[^A-Za-z0-9]/.test(password)) score++;
-		return score;
-	})());
+	const strength = $derived(
+		(() => {
+			if (!password) return 0;
+			let score = 0;
+			if (password.length >= 8) score++;
+			if (password.length >= 12) score++;
+			if (/[A-Z]/.test(password)) score++;
+			if (/[0-9]/.test(password)) score++;
+			if (/[^A-Za-z0-9]/.test(password)) score++;
+			return score;
+		})()
+	);
 	const strengthLabel = $derived(
 		strength <= 1 ? 'Weak' : strength <= 3 ? 'Fair' : strength <= 4 ? 'Good' : 'Strong'
 	);
@@ -35,12 +37,24 @@
 {#if form?.success}
 	<div class="success-state">
 		<div class="success-icon">
-			<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.67 12a19.79 19.79 0 0 1-3-8.59A2 2 0 0 1 3.59 1.5h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+			<svg
+				width="32"
+				height="32"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.67 12a19.79 19.79 0 0 1-3-8.59A2 2 0 0 1 3.59 1.5h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+				/>
 			</svg>
 		</div>
 		<h2>Check your email</h2>
-		<p>We sent a confirmation link to <strong>{form.email}</strong>. Click it to activate your account.</p>
+		<p>
+			We sent a confirmation link to <strong>{form.email}</strong>. Click it to activate your
+			account.
+		</p>
 		<a href="/login" class="btn-secondary">Back to sign in</a>
 	</div>
 {:else}
@@ -99,15 +113,31 @@
 					onclick={() => (showPassword = !showPassword)}
 				>
 					{#if showPassword}
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-							<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-							<line x1="1" y1="1" x2="23" y2="23"/>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path
+								d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
+							/>
+							<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+							<line x1="1" y1="1" x2="23" y2="23" />
 						</svg>
 					{:else}
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-							<circle cx="12" cy="12" r="3"/>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+							<circle cx="12" cy="12" r="3" />
 						</svg>
 					{/if}
 				</button>
@@ -144,15 +174,31 @@
 					onclick={() => (showConfirm = !showConfirm)}
 				>
 					{#if showConfirm}
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-							<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-							<line x1="1" y1="1" x2="23" y2="23"/>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path
+								d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
+							/>
+							<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+							<line x1="1" y1="1" x2="23" y2="23" />
 						</svg>
 					{:else}
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-							<circle cx="12" cy="12" r="3"/>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+							<circle cx="12" cy="12" r="3" />
 						</svg>
 					{/if}
 				</button>
@@ -221,18 +267,30 @@
 		font-size: 0.9rem;
 		color: var(--text);
 		outline: none;
-		transition: border-color 0.15s, box-shadow 0.15s;
+		transition:
+			border-color 0.15s,
+			box-shadow 0.15s;
 		font-family: inherit;
 	}
-	input::placeholder { color: var(--muted); opacity: 0.6; }
+	input::placeholder {
+		color: var(--muted);
+		opacity: 0.6;
+	}
 	input:focus {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 3px var(--accent-glow);
 	}
-	input:disabled { opacity: 0.5; cursor: not-allowed; }
+	input:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 
-	.input-wrap { position: relative; }
-	.input-wrap input { padding-right: 2.5rem; }
+	.input-wrap {
+		position: relative;
+	}
+	.input-wrap input {
+		padding-right: 2.5rem;
+	}
 	.eye-toggle {
 		position: absolute;
 		right: 0.75rem;
@@ -247,7 +305,9 @@
 		padding: 0;
 		transition: color 0.15s;
 	}
-	.eye-toggle:hover { color: var(--text); }
+	.eye-toggle:hover {
+		color: var(--text);
+	}
 
 	.strength-bar {
 		display: flex;
@@ -265,7 +325,9 @@
 	.strength-fill {
 		height: 100%;
 		border-radius: 99px;
-		transition: width 0.3s ease, background 0.3s ease;
+		transition:
+			width 0.3s ease,
+			background 0.3s ease;
 	}
 	.strength-label {
 		font-size: 0.72rem;
@@ -289,11 +351,20 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-		transition: opacity 0.15s, transform 0.1s;
+		transition:
+			opacity 0.15s,
+			transform 0.1s;
 		font-family: inherit;
 	}
-	.btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-	.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+	.btn-primary:hover:not(:disabled) {
+		opacity: 0.9;
+		transform: translateY(-1px);
+	}
+	.btn-primary:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		transform: none;
+	}
 
 	.spinner {
 		width: 14px;
@@ -303,7 +374,11 @@
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	.switch-link {
 		margin-top: 1.25rem;
@@ -311,7 +386,10 @@
 		font-size: 0.85rem;
 		color: var(--muted);
 	}
-	.switch-link a { color: var(--accent); font-weight: 500; }
+	.switch-link a {
+		color: var(--accent);
+		font-weight: 500;
+	}
 
 	/* Success state */
 	.success-state {
@@ -342,7 +420,9 @@
 		line-height: 1.6;
 		margin-bottom: 1.5rem;
 	}
-	.success-state strong { color: var(--text); }
+	.success-state strong {
+		color: var(--text);
+	}
 	.btn-secondary {
 		display: inline-flex;
 		align-items: center;
@@ -356,5 +436,7 @@
 		text-decoration: none;
 		transition: border-color 0.15s;
 	}
-	.btn-secondary:hover { border-color: var(--accent); }
+	.btn-secondary:hover {
+		border-color: var(--accent);
+	}
 </style>

@@ -17,10 +17,12 @@
 			const current = direction === 'horizontal' ? ev.clientX : ev.clientY;
 			const delta = current - startPos;
 			startPos = current;
-			el?.dispatchEvent(new CustomEvent('panel-resize', {
-				detail: { delta, direction, panel },
-				bubbles: true,
-			}));
+			el?.dispatchEvent(
+				new CustomEvent('panel-resize', {
+					detail: { delta, direction, panel },
+					bubbles: true,
+				})
+			);
 		};
 
 		const onUp = () => {
@@ -54,7 +56,10 @@
 		position: relative;
 		z-index: 10;
 	}
-	.resizer:hover, .resizer.dragging { background: var(--accent); }
+	.resizer:hover,
+	.resizer.dragging {
+		background: var(--accent);
+	}
 
 	.resizer.horizontal {
 		width: 4px;
@@ -67,6 +72,8 @@
 	}
 
 	@media (max-width: 768px) {
-		.resizer { display: none; }
+		.resizer {
+			display: none;
+		}
 	}
 </style>

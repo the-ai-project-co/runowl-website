@@ -6,12 +6,7 @@ function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value));
 }
 
-function applyResize(
-	currentWidth: number,
-	delta: number,
-	min: number,
-	max: number
-): number {
+function applyResize(currentWidth: number, delta: number, min: number, max: number): number {
 	return clamp(currentWidth + delta, min, max);
 }
 
@@ -88,16 +83,20 @@ describe('layout — responsive breakpoint', () => {
 describe('layout — panel min/max constraints', () => {
 	const PANEL_CONSTRAINTS = {
 		summary: { min: 36, max: 360 },
-		files:   { min: 160, max: 360 },
-		chat:    { min: 260, max: 520 },
+		files: { min: 160, max: 360 },
+		chat: { min: 260, max: 520 },
 	};
 
 	it('summary panel allows collapse to 36px', () => {
-		expect(applyResize(240, -300, PANEL_CONSTRAINTS.summary.min, PANEL_CONSTRAINTS.summary.max)).toBe(36);
+		expect(
+			applyResize(240, -300, PANEL_CONSTRAINTS.summary.min, PANEL_CONSTRAINTS.summary.max)
+		).toBe(36);
 	});
 
 	it('chat panel enforces 260px minimum', () => {
-		expect(applyResize(340, -200, PANEL_CONSTRAINTS.chat.min, PANEL_CONSTRAINTS.chat.max)).toBe(260);
+		expect(applyResize(340, -200, PANEL_CONSTRAINTS.chat.min, PANEL_CONSTRAINTS.chat.max)).toBe(
+			260
+		);
 	});
 
 	it('chat panel caps at 520px', () => {

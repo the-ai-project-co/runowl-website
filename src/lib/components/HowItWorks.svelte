@@ -15,14 +15,16 @@
 			num: '02',
 			title: 'Reason',
 			description: 'Gemini analyses the diff and decides what context it needs.',
-			detail: 'The model identifies function calls, imports, and patterns that require deeper investigation.',
+			detail:
+				'The model identifies function calls, imports, and patterns that require deeper investigation.',
 		},
 		{
 			Icon: FolderSearch,
 			num: '03',
 			title: 'Fetch Context',
 			description: 'Reads related files, searches code, lists directories.',
-			detail: 'All via GitHub API in a Deno sandbox — no network access, no shell, whitelisted tools only.',
+			detail:
+				'All via GitHub API in a Deno sandbox — no network access, no shell, whitelisted tools only.',
 		},
 		{
 			Icon: RefreshCw,
@@ -36,7 +38,8 @@
 			num: '05',
 			title: 'Post Results',
 			description: 'Findings posted as a PR comment. Check Run updated.',
-			detail: 'P0/P1 findings block the merge. A rule-based reclassifier prevents the LLM from under-classifying critical issues.',
+			detail:
+				'P0/P1 findings block the merge. A rule-based reclassifier prevents the LLM from under-classifying critical issues.',
 		},
 	];
 
@@ -45,7 +48,9 @@
 
 	onMount(() => {
 		const observer = new IntersectionObserver(
-			([entry]) => { if (entry.isIntersecting) visible = true; },
+			([entry]) => {
+				if (entry.isIntersecting) visible = true;
+			},
 			{ threshold: 0.1 }
 		);
 		if (sectionEl) observer.observe(sectionEl);
@@ -92,61 +97,115 @@
 		border-bottom: 1px solid var(--border);
 	}
 
-	.section-header { text-align: center; margin-bottom: 4rem; }
+	.section-header {
+		text-align: center;
+		margin-bottom: 4rem;
+	}
 	.section-eyebrow {
-		font-size: 0.75rem; font-weight: 700;
-		letter-spacing: 0.12em; text-transform: uppercase;
-		color: var(--accent); margin-bottom: 0.75rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin-bottom: 0.75rem;
 	}
 	.section-title {
 		font-size: clamp(1.75rem, 3.5vw, 2.75rem);
-		font-weight: 800; letter-spacing: -0.02em;
-		margin-bottom: 0.75rem; color: var(--text);
+		font-weight: 800;
+		letter-spacing: -0.02em;
+		margin-bottom: 0.75rem;
+		color: var(--text);
 	}
-	.section-sub { font-size: 1rem; color: var(--muted); }
+	.section-sub {
+		font-size: 1rem;
+		color: var(--muted);
+	}
 
 	.steps-container {
-		max-width: 700px; margin: 0 auto;
-		display: flex; flex-direction: column; gap: 0;
+		max-width: 700px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
 	}
 
 	.step {
-		display: flex; gap: 1.5rem;
-		opacity: 0; transform: translateX(-20px);
-		transition: opacity 0.5s ease, transform 0.5s ease;
+		display: flex;
+		gap: 1.5rem;
+		opacity: 0;
+		transform: translateX(-20px);
+		transition:
+			opacity 0.5s ease,
+			transform 0.5s ease;
 		transition-delay: calc(var(--i) * 120ms);
 	}
-	.steps-container.visible .step { opacity: 1; transform: translateX(0); }
+	.steps-container.visible .step {
+		opacity: 1;
+		transform: translateX(0);
+	}
 
 	.step-connector {
-		display: flex; flex-direction: column; align-items: center;
-		flex-shrink: 0; width: 32px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		flex-shrink: 0;
+		width: 32px;
 	}
 	.step-dot {
-		width: 32px; height: 32px; border-radius: 50%;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
 		background: var(--accent-glow);
 		border: 1px solid rgba(124, 106, 247, 0.3);
 		color: var(--accent);
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 	}
 	.step-line {
-		width: 1px; flex: 1; min-height: 32px;
-		background: linear-gradient(to bottom, rgba(124,106,247,0.4), var(--border));
+		width: 1px;
+		flex: 1;
+		min-height: 32px;
+		background: linear-gradient(to bottom, rgba(124, 106, 247, 0.4), var(--border));
 		margin-top: 4px;
 	}
-	.step-connector.last .step-line { display: none; }
+	.step-connector.last .step-line {
+		display: none;
+	}
 
 	.step-content {
-		display: flex; gap: 1rem; padding-bottom: 2.5rem; align-items: flex-start;
+		display: flex;
+		gap: 1rem;
+		padding-bottom: 2.5rem;
+		align-items: flex-start;
 	}
 	.step-num {
-		font-size: 0.65rem; font-weight: 700; color: var(--accent);
-		background: var(--accent-glow); border: 1px solid rgba(124,106,247,0.3);
-		border-radius: 4px; padding: 0.2rem 0.35rem;
-		font-family: monospace; flex-shrink: 0; margin-top: 6px;
+		font-size: 0.65rem;
+		font-weight: 700;
+		color: var(--accent);
+		background: var(--accent-glow);
+		border: 1px solid rgba(124, 106, 247, 0.3);
+		border-radius: 4px;
+		padding: 0.2rem 0.35rem;
+		font-family: monospace;
+		flex-shrink: 0;
+		margin-top: 6px;
 	}
-	.step-body h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
-	.step-desc { font-size: 0.875rem; color: var(--text); margin-bottom: 0.3rem; }
-	.step-detail { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+	.step-body h3 {
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--text);
+		margin-bottom: 0.3rem;
+	}
+	.step-desc {
+		font-size: 0.875rem;
+		color: var(--text);
+		margin-bottom: 0.3rem;
+	}
+	.step-detail {
+		font-size: 0.8rem;
+		color: var(--muted);
+		line-height: 1.6;
+	}
 </style>

@@ -79,9 +79,7 @@
 		<div class="feedback-header">
 			<span class="label">Feedback</span>
 			<h2>Help us build something you love</h2>
-			<p class="subtitle">
-				RunOwl is built in the open. Your feedback shapes every release.
-			</p>
+			<p class="subtitle">RunOwl is built in the open. Your feedback shapes every release.</p>
 		</div>
 
 		<div class="feedback-card">
@@ -100,7 +98,10 @@
 							aria-selected={activeType === tab.id}
 							class="tab"
 							class:active={activeType === tab.id}
-							onclick={() => { activeType = tab.id; reset(); }}
+							onclick={() => {
+								activeType = tab.id;
+								reset();
+							}}
 						>
 							<tab.Icon size={14} />
 							{tab.label}
@@ -129,7 +130,11 @@
 							disabled={status === 'submitting'}
 						/>
 
-						<button type="submit" class="submit-btn" disabled={status === 'submitting' || message.trim().length < 10}>
+						<button
+							type="submit"
+							class="submit-btn"
+							disabled={status === 'submitting' || message.trim().length < 10}
+						>
 							{#if status === 'submitting'}
 								<span class="spinner" aria-hidden="true"></span>
 								Sending…
@@ -217,10 +222,14 @@
 		border: none;
 		border-bottom: 2px solid transparent;
 		cursor: pointer;
-		transition: color 0.15s, border-color 0.15s;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
 		margin-bottom: -1px;
 	}
-	.tab:hover { color: var(--text); }
+	.tab:hover {
+		color: var(--text);
+	}
 	.tab.active {
 		color: var(--accent);
 		border-bottom-color: var(--accent);
@@ -248,9 +257,16 @@
 		transition: border-color 0.15s;
 		box-sizing: border-box;
 	}
-	.textarea::placeholder { color: var(--muted); }
-	.textarea:focus { outline: none; border-color: var(--accent); }
-	.textarea:disabled { opacity: 0.5; }
+	.textarea::placeholder {
+		color: var(--muted);
+	}
+	.textarea:focus {
+		outline: none;
+		border-color: var(--accent);
+	}
+	.textarea:disabled {
+		opacity: 0.5;
+	}
 
 	.form-footer {
 		display: flex;
@@ -259,7 +275,9 @@
 	}
 
 	@media (max-width: 540px) {
-		.form-footer { flex-direction: column; }
+		.form-footer {
+			flex-direction: column;
+		}
 	}
 
 	.email-input {
@@ -274,9 +292,16 @@
 		transition: border-color 0.15s;
 		min-width: 0;
 	}
-	.email-input::placeholder { color: var(--muted); }
-	.email-input:focus { outline: none; border-color: var(--accent); }
-	.email-input:disabled { opacity: 0.5; }
+	.email-input::placeholder {
+		color: var(--muted);
+	}
+	.email-input:focus {
+		outline: none;
+		border-color: var(--accent);
+	}
+	.email-input:disabled {
+		opacity: 0.5;
+	}
 
 	.submit-btn {
 		display: inline-flex;
@@ -291,21 +316,33 @@
 		font-weight: 600;
 		cursor: pointer;
 		white-space: nowrap;
-		transition: opacity 0.15s, transform 0.15s;
+		transition:
+			opacity 0.15s,
+			transform 0.15s;
 	}
-	.submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-	.submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+	.submit-btn:hover:not(:disabled) {
+		opacity: 0.88;
+		transform: translateY(-1px);
+	}
+	.submit-btn:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
 
 	/* Spinner */
 	.spinner {
 		width: 13px;
 		height: 13px;
-		border: 2px solid rgba(255,255,255,0.3);
+		border: 2px solid rgba(255, 255, 255, 0.3);
 		border-top-color: #fff;
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	/* Error */
 	.error-banner {
@@ -313,8 +350,8 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.65rem 0.9rem;
-		background: rgba(var(--red-rgb, 255,60,60), 0.08);
-		border: 1px solid rgba(var(--red-rgb, 255,60,60), 0.2);
+		background: rgba(var(--red-rgb, 255, 60, 60), 0.08);
+		border: 1px solid rgba(var(--red-rgb, 255, 60, 60), 0.2);
 		border-radius: 8px;
 		font-size: 0.85rem;
 		color: var(--red, #e53e3e);
@@ -330,7 +367,9 @@
 		gap: 0.75rem;
 	}
 
-	:global(.success-icon) { color: var(--green); }
+	:global(.success-icon) {
+		color: var(--green);
+	}
 
 	.success-state h3 {
 		font-size: 1.2rem;
@@ -353,7 +392,12 @@
 		font-size: 0.85rem;
 		font-weight: 600;
 		cursor: pointer;
-		transition: color 0.15s, border-color 0.15s;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
 	}
-	.reset-btn:hover { color: var(--text); border-color: var(--muted); }
+	.reset-btn:hover {
+		color: var(--text);
+		border-color: var(--muted);
+	}
 </style>
