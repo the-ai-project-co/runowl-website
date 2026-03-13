@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Plus, FlaskConical, CheckCircle, XCircle, Clock, Play, ChevronRight, X } from 'lucide-svelte';
+	import { Plus, FlaskConical, CheckCircle, XCircle, Clock, Play, ChevronRight, X, AlertCircle } from 'lucide-svelte';
 
 	interface TestSuite {
 		id: string;
@@ -13,48 +13,35 @@
 		version: number;
 	}
 
-	const demoSuites: TestSuite[] = [
-		{
-			id: '1',
-			name: 'Auth module tests',
-			repo: 'acme/api',
-			last_run: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-			status: 'passing',
-			tests_count: 24,
-			pass_count: 24,
-			fail_count: 0,
-			version: 3,
-		},
-		{
-			id: '2',
-			name: 'Payment flow tests',
-			repo: 'acme/api',
-			last_run: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-			status: 'failing',
-			tests_count: 18,
-			pass_count: 15,
-			fail_count: 3,
-			version: 2,
-		},
-		{
-			id: '3',
-			name: 'UI component smoke tests',
-			repo: 'acme/web',
-			last_run: null,
-			status: 'never',
-			tests_count: 8,
-			pass_count: 0,
-			fail_count: 0,
-			version: 1,
-		},
-	];
-
-	let suites = $state<TestSuite[]>(demoSuites);
+	let suites = $state<TestSuite[]>([]);
+	let loading = $state(true);
+	let loadError = $state('');
 	let showCreate = $state(false);
 	let newName = $state('');
 	let newRepo = $state('');
 	let createError = $state('');
 	let creating = $state(false);
+	let runningIds = $state<Set<string>>(new Set());
+
+	// Load suites from API on mount
+	$effect(() => {
+		fetchSuites();
+	});
+
+	async function fetchSuites() {
+		loading = true;
+		loadError = '';
+		try {
+			const res = await fetch('/api/tests/suites');
+			if (!res.ok) throw new Error(`${res.status}`);
+			const data = await res.json();
+			suites = data.suites ?? [];
+		} catch {
+			loadError = 'Failed to load test suites.';
+		} finally {
+			loading = false;
+		}
+	}
 
 	function formatRun(iso: string | null) {
 		if (!iso) return null;
@@ -72,7 +59,8 @@
 		if (!newName.trim()) { createError = 'Name is required.'; return; }
 		if (!newRepo.trim()) { createError = 'Repository is required.'; return; }
 		creating = true;
-		await new Promise((r) => setTimeout(r, 600));
+		// Optimistically add — in real mode the backend would create it
+		await new Promise((r) => setTimeout(r, 500));
 		suites = [
 			...suites,
 			{
@@ -93,6 +81,55 @@
 		newRepo = '';
 	}
 
+	async function runSuite(suite: TestSuite) {
+		if (runningIds.has(suite.id)) return;
+		runningIds = new Set([...runningIds, suite.id]);
+
+		// Parse owner/repo from suite.repo string
+		const [owner, repo] = suite.repo.split('/');
+		try {
+			const res = await fetch('/api/tests/run', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ owner: owner ?? 'acme', repo: repo ?? 'api', pr_number: 1 }),
+			});
+			if (res.ok) {
+				// Poll for results after a short delay to simulate background execution
+				setTimeout(() => pollResults(suite.id), 3000);
+			}
+		} catch {
+			// noop — mark as done optimistically
+		}
+
+		// Update UI to pending
+		suites = suites.map((s) => s.id === suite.id ? { ...s, status: 'pending' as const } : s);
+	}
+
+	async function pollResults(suiteId: string) {
+		try {
+			const res = await fetch(`/api/tests/results?suite_id=${suiteId}`);
+			if (res.ok) {
+				const data = await res.json();
+				suites = suites.map((s) =>
+					s.id === suiteId
+						? {
+								...s,
+								status: (data.failed ?? 0) > 0 ? 'failing' as const : 'passing' as const,
+								pass_count: data.passed ?? s.pass_count,
+								fail_count: data.failed ?? s.fail_count,
+								tests_count: data.total ?? s.tests_count,
+								last_run: new Date().toISOString(),
+							}
+						: s
+				);
+			}
+		} catch {
+			// noop
+		} finally {
+			runningIds = new Set([...runningIds].filter((id) => id !== suiteId));
+		}
+	}
+
 	function closeCreate() {
 		showCreate = false;
 		newName = '';
@@ -106,19 +143,6 @@
 
 	function onKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') closeCreate();
-	}
-
-	function simulateRun(id: string) {
-		suites = suites.map((s) =>
-			s.id === id ? { ...s, status: 'pending' as const } : s
-		);
-		setTimeout(() => {
-			suites = suites.map((s) =>
-				s.id === id
-					? { ...s, status: 'passing' as const, last_run: new Date().toISOString(), pass_count: s.tests_count, fail_count: 0 }
-					: s
-			);
-		}, 2000);
 	}
 </script>
 
@@ -141,8 +165,19 @@
 		</button>
 	</div>
 
-	<!-- Suite cards -->
-	{#if suites.length === 0}
+	{#if loading}
+		<div class="loading-grid">
+			{#each [1, 2, 3] as _}
+				<div class="skeleton-card"></div>
+			{/each}
+		</div>
+	{:else if loadError}
+		<div class="error-banner">
+			<AlertCircle size={16} />
+			{loadError}
+			<button class="retry-btn" onclick={fetchSuites}>Retry</button>
+		</div>
+	{:else if suites.length === 0}
 		<div class="empty-state">
 			<FlaskConical size={40} strokeWidth={1.25} opacity={0.25} />
 			<p>No test suites yet.</p>
@@ -151,6 +186,7 @@
 	{:else}
 		<div class="suites-grid">
 			{#each suites as suite (suite.id)}
+				{@const isRunning = runningIds.has(suite.id) || suite.status === 'pending'}
 				{@const runLabel = formatRun(suite.last_run)}
 				<div class="suite-card status-{suite.status}">
 					<!-- Card header -->
@@ -166,7 +202,7 @@
 					<div class="suite-stats">
 						{#if suite.status === 'never'}
 							<span class="stat-chip chip-muted">Never run</span>
-						{:else if suite.status === 'pending'}
+						{:else if isRunning}
 							<span class="stat-chip chip-yellow">
 								<Clock size={11} />
 								Running…
@@ -188,7 +224,7 @@
 					</div>
 
 					<!-- Progress bar -->
-					{#if suite.tests_count > 0 && suite.status !== 'never' && suite.status !== 'pending'}
+					{#if suite.tests_count > 0 && suite.status !== 'never' && !isRunning}
 						<div class="pass-bar-track">
 							<div
 								class="pass-bar-fill"
@@ -211,8 +247,8 @@
 						<div class="suite-actions">
 							<button
 								class="run-btn"
-								onclick={() => simulateRun(suite.id)}
-								disabled={suite.status === 'pending'}
+								onclick={() => runSuite(suite)}
+								disabled={isRunning}
 								title="Run suite"
 							>
 								<Play size={12} />
@@ -330,6 +366,48 @@
 		transition: opacity 0.15s, transform 0.15s;
 	}
 	.cta-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+	/* Loading skeletons */
+	.loading-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1rem;
+	}
+	.skeleton-card {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		height: 148px;
+		animation: shimmer 1.4s ease-in-out infinite;
+	}
+	@keyframes shimmer {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
+	}
+
+	/* Error banner */
+	.error-banner {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		background: color-mix(in srgb, var(--red) 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--red) 20%, transparent);
+		color: var(--red);
+		font-size: 0.82rem;
+	}
+	.retry-btn {
+		margin-left: auto;
+		background: none;
+		border: 1px solid currentColor;
+		border-radius: 5px;
+		padding: 0.2rem 0.6rem;
+		font-size: 0.75rem;
+		color: inherit;
+		cursor: pointer;
+		font-family: inherit;
+	}
 
 	.empty-state {
 		display: flex;

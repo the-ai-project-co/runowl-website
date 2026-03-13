@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { MOCK, mockSuites } from '$lib/server/seed';
 
 /** POST /api/tests/run */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -7,7 +8,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!session) error(401, 'Unauthorized');
 
 	const body = await request.json().catch(() => null);
-	if (!body?.url) error(400, 'url is required');
+	if (!body?.owner || !body?.repo || !body?.pr_number) error(400, 'owner, repo, pr_number are required');
+
+	// CI / demo mode
+	if (MOCK) {
+		const suite = mockSuites[0];
+		return json({
+			suite_id: suite.id,
+			pr_ref: `${body.owner}/${body.repo}#${body.pr_number}`,
+			status: 'running',
+			message: `Executing ${suite.tests_count} generated tests in background`,
+		});
+	}
 
 	const backendUrl = process.env.RUNOWL_BACKEND_URL ?? 'http://localhost:8000';
 

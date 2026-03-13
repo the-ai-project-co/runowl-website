@@ -98,6 +98,76 @@ export const mockFiles = [
 	{ filename: 'README.md', status: 'modified', additions: 25, deletions: 0, patch: `@@ -10,0 +11,25 @@\n+## Rate Limiting\n+All auth routes are protected by token bucket rate limiting.\n+- Login: 5 req/min\n+- Register: 3 req/5min\n+- Reset password: 2 req/10min`, blob_url: '' },
 ];
 
+// ── Test case results (keyed by suite_id) ─────────────────────────────────────
+export const mockTestCases: Record<string, object[]> = {
+	s1: [
+		{ id: 'tc1', name: 'login() returns 200 with valid credentials', status: 'pass', type: 'unit', duration_ms: 42, framework: 'pytest' },
+		{ id: 'tc2', name: 'login() returns 401 with invalid password', status: 'pass', type: 'unit', duration_ms: 38, framework: 'pytest' },
+		{ id: 'tc3', name: 'login() returns 429 after rate limit exceeded', status: 'pass', type: 'unit', duration_ms: 55, framework: 'pytest' },
+		{ id: 'tc4', name: 'register() creates user and returns 201', status: 'pass', type: 'unit', duration_ms: 91, framework: 'pytest' },
+		{ id: 'tc5', name: 'register() returns 409 for duplicate email', status: 'pass', type: 'unit', duration_ms: 47, framework: 'pytest' },
+		{ id: 'tc6', name: 'register() enforces rate limit (3 req/5min)', status: 'pass', type: 'integration', duration_ms: 61, framework: 'pytest' },
+		{ id: 'tc7', name: 'resetPassword() sends email for known user', status: 'pass', type: 'unit', duration_ms: 84, framework: 'pytest' },
+		{ id: 'tc8', name: 'resetPassword() returns 429 after 2 attempts', status: 'pass', type: 'integration', duration_ms: 53, framework: 'pytest' },
+	],
+	s2: [
+		{ id: 'tc1', name: 'checkout() creates order with valid cart', status: 'pass', type: 'integration', duration_ms: 120, framework: 'jest' },
+		{ id: 'tc2', name: 'checkout() applies discount code correctly', status: 'pass', type: 'unit', duration_ms: 88, framework: 'jest' },
+		{ id: 'tc3', name: 'checkout() fails gracefully on payment timeout', status: 'fail', type: 'integration', duration_ms: 5012, framework: 'jest', error: 'Expected status 504, received 500. Payment gateway mock not properly configured.' },
+		{ id: 'tc4', name: 'refund() reverses charge within 24h window', status: 'pass', type: 'unit', duration_ms: 77, framework: 'jest' },
+		{ id: 'tc5', name: 'refund() rejects request outside window', status: 'pass', type: 'unit', duration_ms: 64, framework: 'jest' },
+		{ id: 'tc6', name: 'webhook() verifies Stripe signature', status: 'fail', type: 'unit', duration_ms: 19, framework: 'jest', error: 'TypeError: Cannot read properties of undefined (reading "signature"). Missing STRIPE_WEBHOOK_SECRET in test env.' },
+		{ id: 'tc7', name: 'webhook() idempotent on duplicate events', status: 'pass', type: 'unit', duration_ms: 45, framework: 'jest' },
+		{ id: 'tc8', name: 'invoice() generates PDF for completed order', status: 'fail', type: 'unit', duration_ms: 203, framework: 'jest', error: 'PDFKit dependency missing in sandbox environment.' },
+	],
+	s3: [],
+};
+
+export const mockSuiteResults: Record<string, object> = {
+	s1: {
+		suite_id: 's1',
+		pr_ref: 'acme/api#142',
+		status: 'done',
+		passed: 8,
+		failed: 0,
+		errors: 0,
+		skipped: 0,
+		total: 8,
+		duration_ms: 471,
+		cases: mockTestCases['s1'],
+		video_url: null,
+		replay_url: null,
+	},
+	s2: {
+		suite_id: 's2',
+		pr_ref: 'acme/api#139',
+		status: 'done',
+		passed: 5,
+		failed: 3,
+		errors: 0,
+		skipped: 0,
+		total: 8,
+		duration_ms: 5628,
+		cases: mockTestCases['s2'],
+		video_url: null,
+		replay_url: null,
+	},
+	s3: {
+		suite_id: 's3',
+		pr_ref: null,
+		status: 'never',
+		passed: 0,
+		failed: 0,
+		errors: 0,
+		skipped: 0,
+		total: 0,
+		duration_ms: 0,
+		cases: [],
+		video_url: null,
+		replay_url: null,
+	},
+};
+
 export const mockFindings = [
 	{ id: 'f1', severity: 'P0' as const, type: 'security' as const, title: 'Memory not cleared — Map grows unbounded', description: 'RateLimiter uses an in-memory Map with setTimeout cleanup. Under high load, the cleanup may not fire before OOM.', file: 'src/middleware/rateLimiter.ts', line_start: 3, line_end: 8, suggestion: 'Use a circular buffer or an external store (Redis) for rate limit counters.' },
 	{ id: 'f2', severity: 'P1' as const, type: 'security' as const, title: 'IP spoofing via X-Forwarded-For', description: 'req.ip may read a spoofed X-Forwarded-For header if behind a load balancer without trust-proxy set.', file: 'src/routes/auth/login.ts', line_start: 4, line_end: 4, suggestion: "Set `app.set('trust proxy', 1)` and validate the proxy chain." },

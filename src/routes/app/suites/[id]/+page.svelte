@@ -10,100 +10,118 @@
 		Play,
 		RefreshCw,
 		Terminal,
+		Video,
+		Rewind,
+		AlertCircle,
 	} from 'lucide-svelte';
-
-	interface TestSuite {
-		id: string;
-		name: string;
-		repo: string;
-		last_run: string | null;
-		status: 'passing' | 'failing' | 'pending' | 'never';
-		tests_count: number;
-		pass_count: number;
-		fail_count: number;
-		version: number;
-	}
 
 	interface TestCase {
 		id: string;
 		name: string;
-		status: 'pass' | 'fail' | 'pending';
+		status: 'pass' | 'fail' | 'error' | 'skip' | 'timeout' | 'pending';
+		type?: string;
+		framework?: string;
 		duration_ms: number;
 		error?: string;
+		video_url?: string | null;
+		replay_url?: string | null;
 	}
 
-	// Demo data keyed by suite ID
-	const suiteData: Record<string, TestSuite> = {
-		'1': {
-			id: '1',
-			name: 'Auth module tests',
-			repo: 'acme/api',
-			last_run: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-			status: 'passing',
-			tests_count: 24,
-			pass_count: 24,
-			fail_count: 0,
-			version: 3,
-		},
-		'2': {
-			id: '2',
-			name: 'Payment flow tests',
-			repo: 'acme/api',
-			last_run: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-			status: 'failing',
-			tests_count: 18,
-			pass_count: 15,
-			fail_count: 3,
-			version: 2,
-		},
-		'3': {
-			id: '3',
-			name: 'UI component smoke tests',
-			repo: 'acme/web',
-			last_run: null,
-			status: 'never',
-			tests_count: 8,
-			pass_count: 0,
-			fail_count: 0,
-			version: 1,
-		},
-	};
+	interface SuiteResult {
+		suite_id: string;
+		pr_ref: string | null;
+		status: string;
+		passed: number;
+		failed: number;
+		errors: number;
+		skipped: number;
+		total: number;
+		duration_ms: number;
+		cases: TestCase[];
+		video_url: string | null;
+		replay_url: string | null;
+	}
 
-	const testCaseData: Record<string, TestCase[]> = {
-		'1': [
-			{ id: 't1', name: 'login() returns 200 with valid credentials', status: 'pass', duration_ms: 42 },
-			{ id: 't2', name: 'login() returns 401 with invalid password', status: 'pass', duration_ms: 38 },
-			{ id: 't3', name: 'login() returns 429 after rate limit exceeded', status: 'pass', duration_ms: 55 },
-			{ id: 't4', name: 'register() creates user and returns 201', status: 'pass', duration_ms: 91 },
-			{ id: 't5', name: 'register() returns 409 for duplicate email', status: 'pass', duration_ms: 47 },
-			{ id: 't6', name: 'register() enforces rate limit (3 req/5min)', status: 'pass', duration_ms: 61 },
-			{ id: 't7', name: 'resetPassword() sends email for known user', status: 'pass', duration_ms: 84 },
-			{ id: 't8', name: 'resetPassword() returns 429 after 2 attempts', status: 'pass', duration_ms: 53 },
-		],
-		'2': [
-			{ id: 't1', name: 'checkout() creates order with valid cart', status: 'pass', duration_ms: 120 },
-			{ id: 't2', name: 'checkout() applies discount code correctly', status: 'pass', duration_ms: 88 },
-			{ id: 't3', name: 'checkout() fails gracefully on payment timeout', status: 'fail', duration_ms: 5012, error: 'Expected status 504, received 500. Payment gateway mock not properly configured.' },
-			{ id: 't4', name: 'refund() reverses charge within 24h window', status: 'pass', duration_ms: 77 },
-			{ id: 't5', name: 'refund() rejects request outside window', status: 'pass', duration_ms: 64 },
-			{ id: 't6', name: 'webhook() verifies Stripe signature', status: 'fail', duration_ms: 19, error: 'TypeError: Cannot read properties of undefined (reading "signature"). Missing STRIPE_WEBHOOK_SECRET in test env.' },
-			{ id: 't7', name: 'webhook() idempotent on duplicate events', status: 'pass', duration_ms: 45 },
-			{ id: 't8', name: 'invoice() generates PDF for completed order', status: 'fail', duration_ms: 203, error: 'PDFKit dependency missing in sandbox environment.' },
-		],
-		'3': [],
-	};
+	// Minimal suite metadata shown while/before results load
+	interface SuiteMeta {
+		id: string;
+		name: string;
+		repo: string;
+		last_run: string | null;
+		version: number;
+		tests_count: number;
+	}
 
 	const suiteId = $derived($page.params.id);
-	let suite = $state<TestSuite | null>(null);
+
+	let meta = $state<SuiteMeta | null>(null);
+	let result = $state<SuiteResult | null>(null);
 	let tests = $state<TestCase[]>([]);
+	let loading = $state(true);
+	let loadError = $state('');
 	let running = $state(false);
 	let runLog = $state<string[]>([]);
+	let activeVideo = $state<string | null>(null);
+	let activeReplay = $state<string | null>(null);
 
+	// Load suite results on mount / id change
 	$effect(() => {
-		const s = suiteId ? suiteData[suiteId] : undefined;
-		suite = s ?? null;
-		tests = suiteId ? (testCaseData[suiteId] ?? []) : [];
+		if (suiteId) loadSuite(suiteId);
 	});
+
+	async function loadSuite(id: string) {
+		loading = true;
+		loadError = '';
+		runLog = [];
+
+		// First try to get the full result
+		try {
+			const res = await fetch(`/api/tests/results?suite_id=${encodeURIComponent(id)}`);
+			if (res.ok) {
+				const data: SuiteResult = await res.json();
+				result = data;
+				tests = (data.cases ?? []) as TestCase[];
+				// Build meta from result data
+				meta = {
+					id,
+					name: id, // will be replaced if we get suite list data
+					repo: data.pr_ref?.split('#')[0] ?? '',
+					last_run: new Date().toISOString(),
+					version: 1,
+					tests_count: data.total,
+				};
+			} else if (res.status === 404) {
+				loadError = 'Suite not found.';
+			} else {
+				loadError = 'Failed to load suite results.';
+			}
+		} catch {
+			loadError = 'Failed to load suite results.';
+		}
+
+		// Also try to get the suite list to get the name
+		try {
+			const listRes = await fetch('/api/tests/suites');
+			if (listRes.ok) {
+				const listData = await listRes.json();
+				const found = listData.suites?.find((s: { id: string; name: string; repo: string; last_run: string | null; version: number; tests_count: number }) => s.id === id);
+				if (found) {
+					meta = {
+						id: found.id,
+						name: found.name,
+						repo: found.repo,
+						last_run: found.last_run,
+						version: found.version,
+						tests_count: found.tests_count,
+					};
+				}
+			}
+		} catch {
+			// non-fatal — meta from result is fine
+		}
+
+		loading = false;
+	}
 
 	function formatRun(iso: string | null) {
 		if (!iso) return null;
@@ -117,46 +135,75 @@
 	}
 
 	async function runSuite() {
-		if (!suite) return;
+		if (!meta || running) return;
 		running = true;
-		runLog = ['[runowl] Starting sandboxed test run…', `[runowl] Suite: ${suite.name} (v${suite.version})`];
+		runLog = ['[runowl] Starting sandboxed test run…', `[runowl] Suite: ${meta.name} (v${meta.version})`];
+
+		// Reset test states to pending for animation
 		tests = tests.map((t) => ({ ...t, status: 'pending' as const }));
 
+		// Trigger backend run
+		const [owner, repo] = meta.repo.split('/');
+		try {
+			await fetch('/api/tests/run', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ owner: owner ?? 'acme', repo: repo ?? 'api', pr_number: 1 }),
+			});
+		} catch {
+			// noop — still animate
+		}
+
+		// Animate through tests one by one, then fetch real results
+		const originalCases = result?.cases ?? [];
 		for (let i = 0; i < tests.length; i++) {
-			await new Promise((r) => setTimeout(r, 180 + Math.random() * 200));
-			const orig = suiteId ? testCaseData[suiteId]?.[i] : undefined;
+			await new Promise((r) => setTimeout(r, 150 + Math.random() * 180));
+			const orig = originalCases[i];
+			const status = orig?.status ?? 'pass';
 			tests = tests.map((t, idx) =>
-				idx === i ? { ...t, status: orig?.status ?? 'pass' } : t
+				idx === i ? { ...t, status: status as TestCase['status'] } : t
 			);
 			runLog = [
 				...runLog,
-				`  ${tests[i].status === 'pass' ? '✓' : '✗'} ${tests[i].name} (${tests[i].duration_ms}ms)`,
+				`  ${status === 'pass' ? '✓' : '✗'} ${tests[i].name} (${tests[i].duration_ms}ms)`,
 			];
 		}
 
+		// Poll for real results
+		await new Promise((r) => setTimeout(r, 800));
+		await loadSuite(suiteId!);
+
 		const passed = tests.filter((t) => t.status === 'pass').length;
-		const failed = tests.filter((t) => t.status === 'fail').length;
+		const failed = tests.filter((t) => t.status === 'fail' || t.status === 'error').length;
 		runLog = [...runLog, `[runowl] Done. ${passed} passed, ${failed} failed.`];
-		if (suite) {
-			suite = {
-				...suite,
-				status: failed > 0 ? 'failing' : 'passing',
-				pass_count: passed,
-				fail_count: failed,
-				last_run: new Date().toISOString(),
-			};
-		}
 		running = false;
+	}
+
+	function statusIcon(status: TestCase['status']) {
+		if (status === 'pass') return { icon: CheckCircle, color: 'var(--green)' };
+		if (status === 'fail' || status === 'error') return { icon: XCircle, color: 'var(--red)' };
+		return { icon: Clock, color: 'var(--yellow)' };
 	}
 </script>
 
 <svelte:head>
-	<title>{suite?.name ?? 'Suite'} — RunOwl</title>
+	<title>{meta?.name ?? 'Suite'} — RunOwl</title>
 </svelte:head>
 
-{#if !suite}
+{#if loading}
+	<div class="detail-page">
+		<div class="skeleton-head"></div>
+		<div class="stats-row">
+			{#each [1,2,3] as _}
+				<div class="skeleton-stat"></div>
+			{/each}
+		</div>
+		<div class="skeleton-list"></div>
+	</div>
+{:else if loadError && !meta}
 	<div class="not-found">
-		<p>Suite not found.</p>
+		<AlertCircle size={32} opacity={0.4} />
+		<p>{loadError}</p>
 		<button class="back-link" onclick={() => goto('/app/suites')}>
 			<ArrowLeft size={14} /> Back to suites
 		</button>
@@ -171,16 +218,23 @@
 				</button>
 				<div class="title-row">
 					<FlaskConical size={17} color="var(--accent)" />
-					<h1 class="page-title">{suite.name}</h1>
-					<span class="version-badge">v{suite.version}</span>
-					<span class="repo-badge">{suite.repo}</span>
+					<h1 class="page-title">{meta?.name ?? suiteId}</h1>
+					{#if meta?.version}
+						<span class="version-badge">v{meta.version}</span>
+					{/if}
+					{#if meta?.repo}
+						<span class="repo-badge">{meta.repo}</span>
+					{/if}
 				</div>
 				<p class="page-sub">
-					{suite.tests_count} tests ·
-					{#if suite.last_run}
-						Last run {formatRun(suite.last_run)}
+					{result?.total ?? meta?.tests_count ?? 0} tests ·
+					{#if meta?.last_run}
+						Last run {formatRun(meta.last_run)}
 					{:else}
 						Never run
+					{/if}
+					{#if result?.pr_ref}
+						· PR {result.pr_ref}
 					{/if}
 				</p>
 			</div>
@@ -198,33 +252,41 @@
 		</div>
 
 		<!-- Stats row -->
-		<div class="stats-row">
-			<div class="stat-card">
-				<span class="stat-value green">{suite.pass_count}</span>
-				<span class="stat-label">Passed</span>
-			</div>
-			<div class="stat-card">
-				<span class="stat-value red">{suite.fail_count}</span>
-				<span class="stat-label">Failed</span>
-			</div>
-			<div class="stat-card">
-				<span class="stat-value">{suite.tests_count}</span>
-				<span class="stat-label">Total</span>
-			</div>
-			{#if suite.tests_count > 0}
-				<div class="stat-card stat-bar-card">
-					<div class="bar-track">
-						<div
-							class="bar-fill"
-							style="width: {(suite.pass_count / suite.tests_count) * 100}%"
-						></div>
-					</div>
-					<span class="stat-label">
-						{Math.round((suite.pass_count / suite.tests_count) * 100)}% passing
-					</span>
+		{#if result}
+			<div class="stats-row">
+				<div class="stat-card">
+					<span class="stat-value green">{result.passed}</span>
+					<span class="stat-label">Passed</span>
 				</div>
-			{/if}
-		</div>
+				<div class="stat-card">
+					<span class="stat-value red">{result.failed + result.errors}</span>
+					<span class="stat-label">Failed</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-value">{result.total}</span>
+					<span class="stat-label">Total</span>
+				</div>
+				{#if result.total > 0}
+					<div class="stat-card stat-bar-card">
+						<div class="bar-track">
+							<div
+								class="bar-fill"
+								style="width: {(result.passed / result.total) * 100}%"
+							></div>
+						</div>
+						<span class="stat-label">
+							{Math.round((result.passed / result.total) * 100)}% passing
+						</span>
+					</div>
+				{/if}
+				{#if result.duration_ms > 0}
+					<div class="stat-card">
+						<span class="stat-value">{(result.duration_ms / 1000).toFixed(1)}s</span>
+						<span class="stat-label">Duration</span>
+					</div>
+				{/if}
+			</div>
+		{/if}
 
 		<div class="content-grid">
 			<!-- Test cases -->
@@ -234,35 +296,92 @@
 					<div class="empty-tests">
 						<FlaskConical size={32} strokeWidth={1.25} opacity={0.25} />
 						<p>No tests generated yet.</p>
-						<p class="empty-hint">Click "Run suite" to generate and execute tests.</p>
+						<p class="empty-hint">Click "Run suite" to generate and execute tests against this repository.</p>
 					</div>
 				{:else}
 					<div class="tests-list">
 						{#each tests as t (t.id)}
-							<div class="test-row" class:test-fail={t.status === 'fail'} class:test-pending={t.status === 'pending'}>
+							{@const { icon: StatusIcon, color } = statusIcon(t.status)}
+							<div class="test-row" class:test-fail={t.status === 'fail' || t.status === 'error'} class:test-pending={t.status === 'pending'}>
 								<div class="test-icon">
-									{#if t.status === 'pass'}
-										<CheckCircle size={14} color="var(--green)" />
-									{:else if t.status === 'fail'}
-										<XCircle size={14} color="var(--red)" />
-									{:else}
-										<Clock size={14} color="var(--yellow)" />
-									{/if}
+									<StatusIcon size={14} {color} />
 								</div>
 								<div class="test-info">
 									<span class="test-name">{t.name}</span>
+									{#if t.framework || t.type}
+										<div class="test-meta-chips">
+											{#if t.framework}
+												<span class="test-chip">{t.framework}</span>
+											{/if}
+											{#if t.type}
+												<span class="test-chip">{t.type}</span>
+											{/if}
+										</div>
+									{/if}
 									{#if t.error}
 										<span class="test-error">{t.error}</span>
 									{/if}
 								</div>
-								{#if t.status !== 'pending'}
-									<span class="test-dur">{t.duration_ms}ms</span>
-								{/if}
+								<div class="test-right">
+									{#if t.status !== 'pending'}
+										<span class="test-dur">{t.duration_ms}ms</span>
+									{/if}
+									{#if t.video_url}
+										<button class="media-btn" onclick={() => activeVideo = t.video_url ?? null} title="Watch recording">
+											<Video size={12} />
+										</button>
+									{/if}
+									{#if t.replay_url}
+										<button class="media-btn" onclick={() => activeReplay = t.replay_url ?? null} title="Session replay">
+											<Rewind size={12} />
+										</button>
+									{/if}
+								</div>
 							</div>
 						{/each}
 					</div>
 				{/if}
 			</div>
+
+			<!-- Video player (shown when a test recording is selected) -->
+			{#if activeVideo}
+				<div class="media-section">
+					<div class="media-head">
+						<Video size={13} color="var(--muted)" />
+						<span class="section-label">Test recording</span>
+						<button class="close-media" onclick={() => activeVideo = null}>✕</button>
+					</div>
+					<div class="video-container">
+						<video
+							src={activeVideo}
+							controls
+							playsinline
+							class="video-player"
+						>
+							<track kind="captions" />
+						</video>
+					</div>
+				</div>
+			{/if}
+
+			<!-- Session replay panel (shown when a replay is selected) -->
+			{#if activeReplay}
+				<div class="media-section">
+					<div class="media-head">
+						<Rewind size={13} color="var(--muted)" />
+						<span class="section-label">Session replay</span>
+						<button class="close-media" onclick={() => activeReplay = null}>✕</button>
+					</div>
+					<div class="replay-container">
+						<iframe
+							src={activeReplay}
+							title="Session replay"
+							class="replay-frame"
+							sandbox="allow-scripts allow-same-origin"
+						></iframe>
+					</div>
+				</div>
+			{/if}
 
 			<!-- Run log -->
 			{#if runLog.length > 0}
@@ -306,6 +425,36 @@
 		color: var(--muted);
 		font-size: 0.88rem;
 	}
+
+	/* Skeletons */
+	.skeleton-head {
+		height: 80px;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		animation: shimmer 1.4s ease-in-out infinite;
+	}
+	.stats-row {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+	.skeleton-stat {
+		height: 78px;
+		width: 90px;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		animation: shimmer 1.4s ease-in-out infinite;
+	}
+	.skeleton-list {
+		height: 240px;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		animation: shimmer 1.4s ease-in-out infinite;
+	}
+	@keyframes shimmer { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
 	.page-head {
 		display: flex;
@@ -385,11 +534,6 @@
 	@keyframes spin { to { transform: rotate(360deg); } }
 
 	/* Stats */
-	.stats-row {
-		display: flex;
-		gap: 0.75rem;
-		flex-wrap: wrap;
-	}
 	.stat-card {
 		background: var(--surface);
 		border: 1px solid var(--border);
@@ -478,13 +622,88 @@
 	.test-icon { flex-shrink: 0; margin-top: 1px; }
 	.test-info { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
 	.test-name { font-size: 0.82rem; color: var(--text); }
+	.test-meta-chips { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+	.test-chip {
+		font-size: 0.65rem;
+		padding: 0.1rem 0.35rem;
+		border-radius: 3px;
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		color: var(--muted);
+		font-weight: 600;
+		text-transform: lowercase;
+	}
 	.test-error {
 		font-size: 0.72rem;
 		color: var(--red);
 		font-family: 'SF Mono', 'Fira Code', monospace;
 		line-height: 1.5;
 	}
-	.test-dur { font-size: 0.7rem; color: var(--muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+	.test-right {
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		flex-shrink: 0;
+	}
+	.test-dur { font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+	.media-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		border-radius: 4px;
+		border: 1px solid var(--border);
+		background: var(--surface-2);
+		color: var(--muted);
+		cursor: pointer;
+		transition: color 0.12s, border-color 0.12s;
+	}
+	.media-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+	/* Video / Replay panels */
+	.media-section {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		overflow: hidden;
+	}
+	.media-head {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.85rem 1.25rem;
+		border-bottom: 1px solid var(--border);
+	}
+	.close-media {
+		margin-left: auto;
+		background: none;
+		border: 1px solid var(--border);
+		border-radius: 5px;
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: var(--muted);
+		font-size: 0.75rem;
+		transition: color 0.12s;
+	}
+	.close-media:hover { color: var(--text); }
+	.video-container { padding: 1rem; background: #000; }
+	.video-player {
+		width: 100%;
+		border-radius: 6px;
+		max-height: 400px;
+	}
+	.replay-container { height: 360px; }
+	.replay-frame {
+		width: 100%;
+		height: 100%;
+		border: none;
+	}
 
 	/* Log section */
 	.log-section {
