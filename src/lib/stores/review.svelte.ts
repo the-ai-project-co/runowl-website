@@ -17,6 +17,7 @@ export interface PRMeta {
 	title: string;
 	body: string | null;
 	author: string;
+	repo: string;
 	head_branch: string;
 	base_branch: string;
 	commits: number;
@@ -68,7 +69,7 @@ function createReviewStore() {
 	let findings = $state<Finding[]>([]);
 	let chatMessages = $state<ChatMessage[]>([]);
 	let streaming = $state(false);
-	let activeTab = $state<'review' | 'flags' | 'bugs'>('review');
+	let activeTab = $state<'review' | 'flags' | 'bugs' | 'tests'>('review');
 	let highlightedLine = $state<{ file: string; line: number } | null>(null);
 	let testSuite = $state<TestSuiteResult | null>(null);
 
@@ -177,10 +178,28 @@ function createReviewStore() {
 			const data = await res.json();
 			findings = data.findings ?? [];
 			status = 'done';
+			// Persist to Supabase (fire-and-forget — don't block on failure)
+			saveReview(findings.length).catch(() => {});
 		} catch (e) {
 			errorMsg = e instanceof Error ? e.message : 'Review failed';
 			status = 'error';
 		}
+	}
+
+	async function saveReview(findingsCount: number) {
+		if (!meta) return;
+		const repo = `${meta.url.split('/')[3]}/${meta.url.split('/')[4]}`;
+		await fetch('/api/reviews', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				pr_url: prUrl,
+				pr_number: meta.number,
+				repo,
+				findings_count: findingsCount,
+				status: 'done',
+			}),
+		});
 	}
 
 	async function sendMessage(question: string) {
@@ -310,7 +329,7 @@ function createReviewStore() {
 		get testSuite() {
 			return testSuite;
 		},
-		set activeTab(v: 'review' | 'flags' | 'bugs') {
+		set activeTab(v: 'review' | 'flags' | 'bugs' | 'tests') {
 			activeTab = v;
 		},
 		reset,

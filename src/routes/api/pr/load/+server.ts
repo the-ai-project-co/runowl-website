@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { MOCK, mockPRMeta, mockFiles } from '$lib/server/seed';
 
 /** POST /api/pr/load — validate PR URL and proxy to backend (or parse via GitHub API) */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -8,6 +9,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const body = await request.json().catch(() => null);
 	const prUrl: string = body?.url ?? '';
+
+	// CI / demo mode
+	if (MOCK) {
+		return json({ meta: mockPRMeta, files: mockFiles });
+	}
 
 	// Validate GitHub PR URL format
 	const match = prUrl.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
@@ -46,6 +52,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			title: meta.title,
 			body: meta.body,
 			author: meta.user?.login ?? 'unknown',
+			repo: `${owner}/${repo}`,
 			head_branch: meta.head?.ref ?? '',
 			base_branch: meta.base?.ref ?? '',
 			commits: meta.commits,

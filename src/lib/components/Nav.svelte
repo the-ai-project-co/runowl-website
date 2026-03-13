@@ -122,7 +122,7 @@
 				GitHub
 			</a>
 
-			<a href="/pricing" class="btn-primary">
+			<a href="/signup" class="btn-primary">
 				Get started
 				<ArrowRight size={13} />
 			</a>

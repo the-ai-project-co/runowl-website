@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { reviewStore } from '$lib/stores/review.svelte';
+	import { githubIntegration } from '$lib/stores/github-integration.svelte';
+	import { privateRepoModal } from '$lib/stores/private-repo-modal.svelte';
+	import { Lock } from 'lucide-svelte';
 
 	let inputUrl = $state('');
 	let inputError = $state('');
@@ -20,6 +23,31 @@
 	}
 
 	const isLoading = $derived(reviewStore.status === 'loading_pr');
+
+	const isPrivateRepoError = $derived(
+		reviewStore.status === 'error' &&
+		(reviewStore.errorMsg?.includes('403') ||
+		 reviewStore.errorMsg?.includes('404') ||
+		 reviewStore.errorMsg?.toLowerCase().includes('not found') ||
+		 reviewStore.errorMsg?.toLowerCase().includes('private'))
+	);
+
+	$effect(() => {
+		if (!isPrivateRepoError || githubIntegration.connected) return;
+		const match = /github\.com\/([^/]+\/[^/]+)\/pull/.exec(inputUrl);
+		const repoName = match ? match[1] : '';
+		const url = inputUrl;
+		privateRepoModal.show(repoName, () => {
+			reviewStore.loadPR(url.trim());
+		});
+	});
+
+	function openConnectModal() {
+		const match = /github\.com\/([^/]+\/[^/]+)\/pull/.exec(inputUrl);
+		privateRepoModal.show(match ? match[1] : '', () => {
+			reviewStore.loadPR(inputUrl.trim());
+		});
+	}
 </script>
 
 <div class="pr-loader">
@@ -68,24 +96,34 @@
 			{/if}
 
 			{#if reviewStore.status === 'error'}
-				<div class="api-error" role="alert">
-					<svg
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
-							x1="12"
-							y1="16"
-							x2="12.01"
-							y2="16"
-						/>
-					</svg>
-					{reviewStore.errorMsg}
-				</div>
+				{#if isPrivateRepoError && !githubIntegration.connected}
+					<div class="private-repo-banner" role="alert">
+						<Lock size={14} />
+						<span>This looks like a private repository.</span>
+						<button class="inline-connect-btn" onclick={openConnectModal}>
+							Connect GitHub to continue →
+						</button>
+					</div>
+				{:else}
+					<div class="api-error" role="alert">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+								x1="12"
+								y1="16"
+								x2="12.01"
+								y2="16"
+							/>
+						</svg>
+						{reviewStore.errorMsg}
+					</div>
+				{/if}
 			{/if}
 		</form>
 
@@ -236,6 +274,34 @@
 		font-size: 0.8rem;
 		color: var(--red);
 	}
+
+	.private-repo-banner {
+		margin-top: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: color-mix(in srgb, var(--yellow) 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--yellow) 25%, transparent);
+		border-left: 3px solid var(--yellow);
+		border-radius: 8px;
+		padding: 0.65rem 0.875rem;
+		font-size: 0.83rem;
+		color: var(--text);
+		flex-wrap: wrap;
+	}
+	.inline-connect-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 0.83rem;
+		font-weight: 600;
+		color: var(--accent);
+		font-family: inherit;
+		padding: 0;
+		transition: opacity 0.12s;
+		white-space: nowrap;
+	}
+	.inline-connect-btn:hover { opacity: 0.8; text-decoration: underline; }
 
 	.api-error {
 		margin-top: 0.75rem;

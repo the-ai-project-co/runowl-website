@@ -9,8 +9,8 @@
 			price: '$0',
 			period: '/ forever',
 			description: 'For individuals and open-source',
-			cta: 'Get started',
-			ctaLink: 'https://github.com/the-ai-project-co/RunOwl',
+			cta: 'Get started free',
+			ctaLink: '/signup',
 			featured: false,
 		},
 		{
@@ -19,7 +19,7 @@
 			period: '/ seat / mo',
 			description: 'For engineering teams',
 			cta: 'Start free trial',
-			ctaLink: 'mailto:hello@runowl.ai',
+			ctaLink: '/signup',
 			featured: true,
 		},
 		{

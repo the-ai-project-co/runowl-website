@@ -1,10 +1,99 @@
 <script lang="ts">
 	import { reviewStore } from '$lib/stores/review.svelte';
+	import { Download } from 'lucide-svelte';
 
 	let collapsed = $state(false);
 
 	const meta = $derived(reviewStore.meta);
 	const status = $derived(reviewStore.status);
+
+	// ── Report downloads ────────────────────────────────────────────────────────
+	function buildMarkdown(): string {
+		if (!meta) return '';
+		const findings = reviewStore.findings;
+		const lines: string[] = [
+			`# RunOwl Review: ${meta.repo} #${meta.number}`,
+			``,
+			`**Title:** ${meta.title}`,
+			`**Author:** ${meta.author}`,
+			`**Branch:** \`${meta.head_branch}\` → \`${meta.base_branch}\``,
+			`**Files changed:** ${meta.changed_files}  |  **+${meta.additions}** / **-${meta.deletions}**`,
+			``,
+			`## Findings (${findings.length})`,
+			``,
+		];
+		if (findings.length === 0) {
+			lines.push('_No issues found._');
+		} else {
+			for (const f of findings) {
+				lines.push(`### [${f.severity}] ${f.title}`);
+				lines.push(`- **File:** \`${f.file}:${f.line_start}\``);
+				lines.push(`- **Type:** ${f.type}`);
+				if (f.suggestion) lines.push(`- **Fix:** ${f.suggestion}`);
+				lines.push('');
+			}
+		}
+		return lines.join('\n');
+	}
+
+	function buildJSON(): string {
+		if (!meta) return '{}';
+		return JSON.stringify(
+			{
+				pr: {
+					number: meta.number,
+					title: meta.title,
+					repo: meta.repo,
+					author: meta.author,
+					state: meta.state,
+					head_branch: meta.head_branch,
+					base_branch: meta.base_branch,
+					changed_files: meta.changed_files,
+					additions: meta.additions,
+					deletions: meta.deletions,
+				},
+				findings: reviewStore.findings,
+				generated_at: new Date().toISOString(),
+			},
+			null,
+			2
+		);
+	}
+
+	function download(content: string, filename: string, mime: string) {
+		const blob = new Blob([content], { type: mime });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+
+	function downloadMarkdown() {
+		download(buildMarkdown(), `runowl-review-${meta?.number ?? 'report'}.md`, 'text/markdown');
+	}
+
+	function downloadJSON() {
+		download(buildJSON(), `runowl-review-${meta?.number ?? 'report'}.json`, 'application/json');
+	}
+
+	// PDF: print-to-PDF via browser window.print with a simple HTML wrapper
+	function downloadPDF() {
+		const md = buildMarkdown();
+		const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>RunOwl Review #${meta?.number}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;line-height:1.6;color:#111}
+pre,code{background:#f4f4f4;padding:2px 4px;border-radius:3px;font-size:0.9em}
+h1{font-size:1.4rem}h2{font-size:1.1rem;margin-top:2rem;border-bottom:1px solid #ddd;padding-bottom:0.3rem}
+h3{font-size:0.95rem;color:#444}ul{margin-left:1.2rem}</style>
+</head><body><pre style="white-space:pre-wrap;font-family:inherit">${md.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`;
+		const win = window.open('', '_blank');
+		if (!win) return;
+		win.document.write(html);
+		win.document.close();
+		win.focus();
+		win.print();
+	}
 
 	function timeAgo(iso: string): string {
 		const diff = Date.now() - new Date(iso).getTime();
@@ -206,6 +295,21 @@
 					{#if !reviewStore.bugs.length && !reviewStore.flags.length}
 						<span class="badge clean-badge">No issues found</span>
 					{/if}
+				</div>
+			{/if}
+
+			<!-- Report downloads (shown when review is done) -->
+			{#if status === 'done'}
+				<div class="download-section">
+					<span class="download-label">
+						<Download size={11} />
+						Export report
+					</span>
+					<div class="download-btns">
+						<button class="dl-btn" onclick={downloadMarkdown} title="Download Markdown report">MD</button>
+						<button class="dl-btn" onclick={downloadJSON} title="Download JSON report">JSON</button>
+						<button class="dl-btn" onclick={downloadPDF} title="Print / Save as PDF">PDF</button>
+					</div>
 				</div>
 			{/if}
 
@@ -497,6 +601,46 @@
 		background: rgba(74, 222, 128, 0.1);
 		color: var(--green);
 		border: 1px solid rgba(74, 222, 128, 0.2);
+	}
+
+	/* Download section */
+	.download-section {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+	.download-label {
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--muted);
+	}
+	.download-btns {
+		display: flex;
+		gap: 0.3rem;
+	}
+	.dl-btn {
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: 5px;
+		padding: 0.2rem 0.45rem;
+		font-size: 0.68rem;
+		font-weight: 700;
+		color: var(--muted);
+		cursor: pointer;
+		font-family: monospace;
+		letter-spacing: 0.02em;
+		transition: color 0.12s, border-color 0.12s, background 0.12s;
+	}
+	.dl-btn:hover {
+		color: var(--text);
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
 	}
 
 	.pr-body {

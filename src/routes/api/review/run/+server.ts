@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { MOCK, mockFindings } from '$lib/server/seed';
 
 /** POST /api/review/run — trigger a review job */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -11,6 +12,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const model: string = body?.model ?? '';
 
 	if (!prUrl) error(400, 'url is required');
+
+	// CI / demo mode
+	if (MOCK) {
+		return json({
+			job_id: 'mock-job-1',
+			status: 'done',
+			findings: mockFindings,
+			summary:
+				'This PR adds rate limiting middleware to auth routes. Found 5 issues including a critical memory leak and an IP spoofing vulnerability.',
+		});
+	}
 
 	const backendUrl = process.env.RUNOWL_BACKEND_URL ?? 'http://localhost:8000';
 

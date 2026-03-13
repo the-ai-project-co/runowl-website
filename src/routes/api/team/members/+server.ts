@@ -1,10 +1,16 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { MOCK, mockMembers } from '$lib/server/seed';
 
 /** GET /api/team/members — list team members for the authenticated user's org */
 export const GET: RequestHandler = async ({ locals }) => {
 	const { session, user } = await locals.safeGetSession();
 	if (!session || !user) error(401, 'Unauthorized');
+
+	// CI / demo mode
+	if (MOCK) {
+		return json({ members: mockMembers });
+	}
 
 	// Fetch members from Supabase (team_members table)
 	const { data, error: dbError } = await locals.supabase

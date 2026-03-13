@@ -16,6 +16,10 @@
 
 <div class="profile-page">
 	<div class="profile-inner">
+		<a href="/app/settings" class="back-link">
+			<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+			Settings
+		</a>
 		<h1>Account settings</h1>
 
 		<!-- Account info (read-only) -->
@@ -195,6 +199,17 @@
 </div>
 
 <style>
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.78rem;
+		color: var(--muted);
+		text-decoration: none;
+		transition: color 0.12s;
+	}
+	.back-link:hover { color: var(--text); }
+
 	.profile-page {
 		flex: 1;
 		overflow-y: auto;

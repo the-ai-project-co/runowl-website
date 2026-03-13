@@ -1,10 +1,22 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { MOCK, mockFindings } from '$lib/server/seed';
 
 /** GET /api/review/results/:jobId */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	const { session } = await locals.safeGetSession();
 	if (!session) error(401, 'Unauthorized');
+
+	// CI / demo mode
+	if (MOCK) {
+		return json({
+			job_id: params.jobId,
+			status: 'done',
+			findings: mockFindings,
+			summary:
+				'This PR adds rate limiting middleware to auth routes. Found 5 issues including a critical memory leak and an IP spoofing vulnerability.',
+		});
+	}
 
 	const backendUrl = process.env.RUNOWL_BACKEND_URL ?? 'http://localhost:8000';
 	const res = await fetch(`${backendUrl}/api/review/results/${params.jobId}`).catch(() => null);

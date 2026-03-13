@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { Github, BookOpen, Terminal } from 'lucide-svelte';
+	import { Github, Terminal, ArrowRight } from 'lucide-svelte';
 </script>
 
 <section class="cta-section">
 	<div class="cta-bg" aria-hidden="true"></div>
 	<div class="cta-content">
 		<h2 class="cta-title">Start reviewing PRs in 30 seconds</h2>
-		<p class="cta-sub">No sign-up required. Free forever for open-source.</p>
+		<p class="cta-sub">Free forever for open-source. No credit card required.</p>
 
 		<div class="cta-command">
 			<Terminal size={14} class="term-icon" />
@@ -14,13 +14,13 @@
 		</div>
 
 		<div class="cta-actions">
-			<a href="https://github.com/the-ai-project-co/RunOwl" target="_blank" class="cta-primary">
+			<a href="/signup" class="cta-primary">
+				Create free account
+				<ArrowRight size={17} />
+			</a>
+			<a href="https://github.com/the-ai-project-co/RunOwl" target="_blank" class="cta-secondary">
 				<Github size={17} />
 				Star on GitHub
-			</a>
-			<a href="/docs/getting-started" class="cta-secondary">
-				<BookOpen size={17} />
-				Read the docs
 			</a>
 		</div>
 	</div>

@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { MOCK } from '$lib/server/seed';
 
 /**
  * POST /api/review/ask — stream an AI answer via SSE.
@@ -15,6 +16,35 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { url: prUrl, question, context } = body ?? {};
 
 	if (!prUrl || !question) error(400, 'url and question are required');
+
+	// CI / demo mode — stream a canned response
+	if (MOCK) {
+		const mockAnswer = `Great question! Looking at the PR, the rate limiter uses an in-memory \`Map\` with \`setTimeout\` for cleanup. The main concern is that under high load, the cleanup callbacks may queue up faster than they execute, causing the Map to grow unbounded and eventually trigger an OOM. A production-grade solution would use Redis with TTL-based keys instead.`;
+		const encoder = new TextEncoder();
+		const stream = new ReadableStream({
+			start(controller) {
+				const words = mockAnswer.split(' ');
+				let i = 0;
+				const interval = setInterval(() => {
+					if (i >= words.length) {
+						controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+						controller.close();
+						clearInterval(interval);
+					} else {
+						controller.enqueue(encoder.encode(`data: ${words[i++]} \n\n`));
+					}
+				}, 40);
+			},
+		});
+		return new Response(stream, {
+			headers: {
+				'Content-Type': 'text/event-stream',
+				'Cache-Control': 'no-cache',
+				Connection: 'keep-alive',
+				'X-Accel-Buffering': 'no',
+			},
+		});
+	}
 
 	const backendUrl = process.env.RUNOWL_BACKEND_URL ?? 'http://localhost:8000';
 

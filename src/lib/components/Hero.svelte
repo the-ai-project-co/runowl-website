@@ -30,8 +30,8 @@
 		</p>
 
 		<div class="hero-actions">
-			<a href="#pricing" class="cta-primary">
-				Start for free
+			<a href="/signup" class="cta-primary">
+				Get started for free
 				<ArrowRight size={16} />
 			</a>
 			<a href="https://github.com/the-ai-project-co/RunOwl" target="_blank" class="cta-secondary">
