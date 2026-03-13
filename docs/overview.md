@@ -67,7 +67,15 @@ RunOwl is an AI agent that reviews code, generates tests, and runs them before m
 |---|---|
 | Phase 1 — AI Code Review | ✅ Complete |
 | Phase 2a — Testing Engine | ✅ Complete (backend) |
-| Phase 2b — Platform & Management | ✅ UI Complete / Backend in progress |
+| Phase 2b — Platform & Management | ✅ Complete (UI + Backend APIs) |
 | Phase 3 — Intelligence & Ecosystem | Planned |
 | Phase 4 — Integrations & Scale | Planned |
 | Phase 5 — Enterprise | Planned |
+
+## Phase 2b — What's Now Complete
+
+- **Team management**: full RBAC server-side — invite/role-change/remove gated to admin/owner only; team page wired to real API with optimistic UI
+- **Workspace management**: `GET /api/workspace` + `POST /api/workspace`; workspace settings page with list, switch, and create modal
+- **Billing**: `GET /api/billing` + `GET /api/billing/usage` reading live Supabase data; billing page wired to real API
+- **Analytics**: `GET /api/reviews?range=7d|30d|90d` with full aggregation; analytics page wired to real API — no seeded data
+- **Settings hub**: Workspaces card added linking to `/app/settings/workspace`

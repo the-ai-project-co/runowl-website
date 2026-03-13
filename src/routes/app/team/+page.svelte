@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { UserPlus, MoreHorizontal, Mail, Shield, Eye, X, Check, Clock } from 'lucide-svelte';
+	import { UserPlus, MoreHorizontal, Mail, Shield, X, Check, Clock, AlertCircle } from 'lucide-svelte';
 
 	interface Member {
 		id: string;
@@ -9,163 +8,145 @@
 		status: 'active' | 'pending';
 		joined_at: string;
 		reviews_count: number;
-		avatar?: string;
 	}
-
-	// Demo members (replace with API call once backend has team endpoints)
-	const demoMembers: Member[] = [
-		{
-			id: '1',
-			email: 'you@example.com',
-			role: 'admin',
-			status: 'active',
-			joined_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-			reviews_count: 18,
-		},
-		{
-			id: '2',
-			email: 'alice@example.com',
-			role: 'reviewer',
-			status: 'active',
-			joined_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
-			reviews_count: 7,
-		},
-		{
-			id: '3',
-			email: 'bob@example.com',
-			role: 'viewer',
-			status: 'pending',
-			joined_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-			reviews_count: 0,
-		},
-	];
 
 	let members = $state<Member[]>([]);
 	let loading = $state(true);
-
-	// Invite modal state
+	let loadError = $state('');
 	let showInvite = $state(false);
 	let inviteEmail = $state('');
-	let inviteRole = $state<'reviewer' | 'viewer'>('reviewer');
+	let inviteRole = $state<'reviewer' | 'viewer' | 'admin'>('reviewer');
 	let inviteError = $state('');
 	let inviteLoading = $state(false);
 	let inviteSuccess = $state(false);
-
-	// Role menu state
 	let openMenuId = $state<string | null>(null);
 
-	onMount(() => {
-		// Simulate loading
-		setTimeout(() => {
-			members = demoMembers;
-			loading = false;
-		}, 400);
-	});
+	$effect(() => { fetchMembers(); });
 
-	function formatDate(iso: string) {
-		const d = new Date(iso);
-		const diffDays = Math.floor((Date.now() - d.getTime()) / 86400000);
-		if (diffDays === 0) return 'Today';
-		if (diffDays === 1) return 'Yesterday';
-		if (diffDays < 30) return `${diffDays}d ago`;
-		return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+	async function fetchMembers() {
+		loading = true;
+		loadError = '';
+		try {
+			const res = await fetch('/api/team/members');
+			if (!res.ok) throw new Error(String(res.status));
+			const data = await res.json();
+			members = (data.members ?? []).map((m: Record<string, unknown>) => ({
+				id: m.id,
+				email: m.email,
+				role: m.role ?? 'viewer',
+				status: m.accepted_at ? 'active' : 'pending',
+				joined_at: (m.accepted_at as string | null) ?? (m.invited_at as string) ?? new Date().toISOString(),
+				reviews_count: (m.reviews_count as number) ?? 0,
+			}));
+		} catch {
+			loadError = 'Failed to load team members.';
+		} finally {
+			loading = false;
+		}
+	}
+
+	const activeCount = $derived(members.filter((m) => m.status === 'active').length);
+	const pendingCount = $derived(members.filter((m) => m.status === 'pending').length);
+
+	const roleOptions = [
+		{ value: 'reviewer' as const, label: 'Reviewer', hint: 'Can review PRs' },
+		{ value: 'viewer' as const, label: 'Viewer', hint: 'Read-only access' },
+		{ value: 'admin' as const, label: 'Admin', hint: 'Full team access' },
+	];
+
+	function avatarColor(email: string) {
+		const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#0ea5e9', '#10b981', '#14b8a6'];
+		let h = 0;
+		for (const c of email) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+		return colors[Math.abs(h) % colors.length];
 	}
 
 	function initials(email: string) {
-		return email.slice(0, 2).toUpperCase();
+		const parts = email.split('@')[0].split(/[._-]/);
+		return parts.length >= 2
+			? (parts[0][0] + parts[1][0]).toUpperCase()
+			: email.slice(0, 2).toUpperCase();
 	}
 
-	function avatarColor(email: string) {
-		const colors = [
-			'#6366f1', '#8b5cf6', '#ec4899', '#f97316',
-			'#10b981', '#3b82f6', '#14b8a6', '#f59e0b',
-		];
-		let hash = 0;
-		for (const c of email) hash = (hash * 31 + c.charCodeAt(0)) % colors.length;
-		return colors[hash];
+	function formatDate(iso: string) {
+		return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 
-	const roleOptions = [
-		{ value: 'admin', label: 'Admin', hint: 'Full access' },
-		{ value: 'reviewer', label: 'Reviewer', hint: 'Run reviews, view results' },
-		{ value: 'viewer', label: 'Viewer', hint: 'View results only' },
-	] as const;
-
-	function changeRole(id: string, role: Member['role']) {
-		members = members.map((m) => (m.id === id ? { ...m, role } : m));
-		openMenuId = null;
+	function onKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') { openMenuId = null; showInvite = false; }
 	}
 
-	function removeMember(id: string) {
-		members = members.filter((m) => m.id !== id);
-		openMenuId = null;
-	}
+	function closeMenus() { openMenuId = null; }
 
-	async function submitInvite() {
-		inviteError = '';
-		if (!inviteEmail.trim()) {
-			inviteError = 'Please enter an email address.';
-			return;
-		}
-		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim())) {
-			inviteError = 'Please enter a valid email address.';
-			return;
-		}
-		if (members.some((m) => m.email === inviteEmail.trim())) {
-			inviteError = 'This person is already on your team.';
-			return;
-		}
-		inviteLoading = true;
-		// Simulate API call
-		await new Promise((r) => setTimeout(r, 800));
-		members = [
-			...members,
-			{
-				id: crypto.randomUUID(),
-				email: inviteEmail.trim(),
-				role: inviteRole,
-				status: 'pending',
-				joined_at: new Date().toISOString(),
-				reviews_count: 0,
-			},
-		];
-		inviteLoading = false;
-		inviteSuccess = true;
-		setTimeout(() => {
-			inviteSuccess = false;
-			showInvite = false;
-			inviteEmail = '';
-			inviteRole = 'reviewer';
-		}, 1500);
+	function onBackdrop(e: MouseEvent) {
+		if (e.target === e.currentTarget) closeInvite();
 	}
 
 	function closeInvite() {
 		showInvite = false;
 		inviteEmail = '';
 		inviteError = '';
-		inviteRole = 'reviewer';
 		inviteSuccess = false;
 	}
 
-	function onBackdrop(e: MouseEvent) {
-		if ((e.target as HTMLElement).classList.contains('modal-backdrop')) closeInvite();
-	}
-
-	function onKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') {
-			closeInvite();
-			openMenuId = null;
+	async function submitInvite() {
+		inviteError = '';
+		const email = inviteEmail.trim();
+		if (!email || !email.includes('@')) { inviteError = 'Enter a valid email address.'; return; }
+		inviteLoading = true;
+		try {
+			const res = await fetch('/api/team/invite', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, role: inviteRole }),
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				if (res.status === 403) inviteError = 'Only admins can invite team members.';
+				else if (res.status === 409) inviteError = 'This email has already been invited.';
+				else inviteError = data?.message ?? 'Failed to send invite.';
+				return;
+			}
+			inviteSuccess = true;
+			setTimeout(() => { closeInvite(); fetchMembers(); }, 1800);
+		} catch {
+			inviteError = 'Network error. Please try again.';
+		} finally {
+			inviteLoading = false;
 		}
 	}
 
-	function closeMenus(e: MouseEvent) {
-		if (!(e.target as HTMLElement).closest('.role-menu-wrap')) {
-			openMenuId = null;
+	async function changeRole(memberId: string, role: 'reviewer' | 'viewer' | 'admin') {
+		const prev = members.map((m) => ({ ...m }));
+		members = members.map((m) => m.id === memberId ? { ...m, role } : m);
+		openMenuId = null;
+		try {
+			const res = await fetch('/api/team/role', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ member_id: memberId, role }),
+			});
+			if (!res.ok) { members = prev; }
+		} catch {
+			members = prev;
 		}
 	}
 
-	const activeCount = $derived(members.filter((m) => m.status === 'active').length);
-	const pendingCount = $derived(members.filter((m) => m.status === 'pending').length);
+	async function removeMember(memberId: string) {
+		const prev = members.map((m) => ({ ...m }));
+		members = members.filter((m) => m.id !== memberId);
+		openMenuId = null;
+		try {
+			const res = await fetch('/api/team/remove', {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ member_id: memberId }),
+			});
+			if (!res.ok) { members = prev; }
+		} catch {
+			members = prev;
+		}
+	}
 </script>
 
 <svelte:window onkeydown={onKeydown} onclick={closeMenus} />
@@ -206,12 +187,27 @@
 		{/each}
 	</div>
 
+	<!-- Error banner -->
+	{#if loadError}
+		<div class="error-banner">
+			<AlertCircle size={15} />
+			{loadError}
+			<button class="retry-btn" onclick={fetchMembers}>Retry</button>
+		</div>
+	{/if}
+
 	<!-- Member table -->
 	<div class="member-card">
 		{#if loading}
 			{#each Array(3) as _, i (i)}
 				<div class="skel-row"></div>
 			{/each}
+		{:else if members.length === 0}
+			<div class="empty-team">
+				<UserPlus size={32} strokeWidth={1.25} opacity={0.25} />
+				<p>No team members yet.</p>
+				<p class="empty-hint">Invite teammates to collaborate on code reviews.</p>
+			</div>
 		{:else}
 			<table class="member-table">
 				<thead>

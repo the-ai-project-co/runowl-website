@@ -2,34 +2,42 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { MOCK, mockReviews, buildMockChartData } from '$lib/server/seed';
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
 	const { user } = await locals.safeGetSession();
 	if (!user) error(401, 'Unauthorized');
+
+	// Range param: 7d | 30d | 90d (default 30d)
+	const rangeParam = url.searchParams.get('range') ?? '30d';
+	const rangeDays = rangeParam === '7d' ? 7 : rangeParam === '90d' ? 90 : 30;
 
 	// CI / demo mode — return seed data without hitting Supabase
 	if (MOCK) {
 		const { activity, findingsDist, topRepos, thisWeek, totalFindings } = buildMockChartData();
+		// Trim/expand activity array to match requested range
+		const rangeActivity = Array(rangeDays).fill(0).map((_, i) => activity[i] ?? 0);
 		return json({
 			reviews: mockReviews,
 			total: mockReviews.length,
-			total_findings: totalFindings,
-			this_week: thisWeek,
-			activity,
-			findings_dist: findingsDist,
-			top_repos: topRepos,
+			totalFindings,
+			thisWeek,
+			activity: rangeActivity,
+			findingsDist,
+			topRepos,
 		});
 	}
+
+	const since = new Date(Date.now() - rangeDays * 86400000).toISOString();
 
 	const { data, error: sbError } = await locals.supabase
 		.from('reviews')
 		.select('id, pr_url, pr_number, repo, findings_count, status, created_at')
 		.eq('user_id', user.id)
+		.gte('created_at', since)
 		.order('created_at', { ascending: false })
-		.limit(50);
+		.limit(500);
 
 	if (sbError) {
-		// Table may not exist yet — return empty list gracefully
-		return json({ reviews: [], total: 0, total_findings: 0, this_week: 0 });
+		return json({ reviews: [], total: 0, totalFindings: 0, thisWeek: 0, activity: Array(rangeDays).fill(0), findingsDist: { clean: 0, low: 0, medium: 0, high: 0 }, topRepos: [] });
 	}
 
 	const reviews = data ?? [];
@@ -38,19 +46,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const thisWeek = reviews.filter((r) => new Date(r.created_at) >= weekAgo).length;
 	const totalFindings = reviews.reduce((sum, r) => sum + (r.findings_count ?? 0), 0);
 
-	// --- Chart data ---
-
-	// Activity: PRs per day for last 14 days (index 0 = oldest)
-	const activity: number[] = Array(14).fill(0);
-	const fourteenDaysAgo = new Date(now.getTime() - 13 * 86400000);
-	fourteenDaysAgo.setHours(0, 0, 0, 0);
+	// Activity: PRs per day for requested range (index 0 = oldest)
+	const activity: number[] = Array(rangeDays).fill(0);
+	const rangeStart = new Date(now.getTime() - (rangeDays - 1) * 86400000);
+	rangeStart.setHours(0, 0, 0, 0);
 	for (const r of reviews) {
 		const d = new Date(r.created_at);
-		const dayIndex = Math.floor((d.getTime() - fourteenDaysAgo.getTime()) / 86400000);
-		if (dayIndex >= 0 && dayIndex < 14) activity[dayIndex]++;
+		const dayIndex = Math.floor((d.getTime() - rangeStart.getTime()) / 86400000);
+		if (dayIndex >= 0 && dayIndex < rangeDays) activity[dayIndex]++;
 	}
 
-	// Findings distribution: clean (0), low (1-2), medium (3-5), high (6+)
 	const findingsDist = { clean: 0, low: 0, medium: 0, high: 0 };
 	for (const r of reviews) {
 		const n = r.findings_count ?? 0;
@@ -60,25 +65,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 		else findingsDist.high++;
 	}
 
-	// Top repos: by review count (top 5)
 	const repoCounts: Record<string, number> = {};
-	for (const r of reviews) {
-		repoCounts[r.repo] = (repoCounts[r.repo] ?? 0) + 1;
-	}
+	for (const r of reviews) repoCounts[r.repo] = (repoCounts[r.repo] ?? 0) + 1;
 	const topRepos = Object.entries(repoCounts)
 		.sort((a, b) => b[1] - a[1])
 		.slice(0, 5)
 		.map(([repo, count]) => ({ repo, count }));
 
-	return json({
-		reviews,
-		total: reviews.length,
-		total_findings: totalFindings,
-		this_week: thisWeek,
-		activity,
-		findings_dist: findingsDist,
-		top_repos: topRepos,
-	});
+	return json({ reviews, total: reviews.length, totalFindings, thisWeek, activity, findingsDist, topRepos });
 };
 
 export const POST: RequestHandler = async ({ locals, request }) => {

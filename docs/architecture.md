@@ -34,11 +34,14 @@ src/
 │   │       ├── DiffViewer.svelte
 │   │       ├── ChatPanel.svelte
 │   │       ├── PrivateRepoModal.svelte
-│   │       └── UpgradeGate.svelte
+│   │       ├── UpgradeGate.svelte
+│   │       ├── VideoPlayer.svelte
+│   │       └── NotificationBell.svelte
 │   ├── stores/            # Svelte 5 singleton stores
 │   │   ├── review.svelte.ts
 │   │   ├── github-integration.svelte.ts
-│   │   └── private-repo-modal.svelte.ts
+│   │   ├── private-repo-modal.svelte.ts
+│   │   └── upgrade.svelte.ts
 │   └── server/
 │       └── seed.ts        # Mock data for CI/demo mode
 ├── routes/
@@ -47,12 +50,13 @@ src/
 │   │   ├── review/        # PR review page
 │   │   ├── suites/        # Test suite management
 │   │   │   └── [id]/      # Suite detail page
-│   │   ├── team/          # Team management
-│   │   ├── analytics/     # Analytics dashboard
+│   │   ├── team/          # Team management (real API)
+│   │   ├── analytics/     # Analytics dashboard (real API)
 │   │   ├── integrations/  # GitHub + third-party integrations
 │   │   ├── profile/       # User profile
 │   │   └── settings/      # Settings hub
-│   │       ├── billing/
+│   │       ├── billing/   # Plan + usage (real API)
+│   │       ├── workspace/ # Workspace list + create (real API)
 │   │       ├── notifications/
 │   │       ├── rules/
 │   │       └── sso/
@@ -63,9 +67,15 @@ src/
 │       │   ├── run/       # Trigger code review
 │       │   ├── ask/       # Q&A (SSE streaming)
 │       │   └── results/[jobId]/
-│       ├── reviews/       # List/save past reviews
+│       ├── reviews/       # List/save past reviews (range param)
+│       ├── billing/       # Plan + invoice history
+│       │   └── usage/     # PR count + seat count vs limits
+│       ├── workspace/     # List + create workspaces
 │       ├── tests/suites/  # Test suite data
-│       └── team/          # Members + invite
+│       └── team/          # Members + invite + role + remove
+│           ├── invite/
+│           ├── role/
+│           └── remove/
 ```
 
 ## Store Pattern
@@ -86,11 +96,31 @@ export const myStore = createStore();
 
 ## API Layer (Backend for Frontend)
 
-All API routes in `src/routes/api/` act as a proxy layer between the SvelteKit frontend and the Python FastAPI backend. Each route:
+All API routes in `src/routes/api/` act as a proxy/BFF layer. Routes split into two groups:
 
-1. Checks the `USE_MOCK_DATA` environment variable
-2. Returns mock seed data if `true` (CI/demo mode)
-3. Otherwise proxies the request to `RUNOWL_BACKEND_URL`
+**Backend proxy routes** (forward to Python FastAPI):
+1. Check `USE_MOCK_DATA` environment variable
+2. Return mock seed data if `true` (CI/demo mode)
+3. Otherwise proxy the request to `RUNOWL_BACKEND_URL`
+
+**Supabase-direct routes** (read/write database themselves):
+- `/api/billing` — reads `subscriptions` + `invoices` tables
+- `/api/billing/usage` — counts `reviews` (this month) + `team_members` (active seats)
+- `/api/workspace` — reads/inserts `workspaces` + `workspace_members` tables
+- `/api/team/invite`, `/api/team/role`, `/api/team/remove` — mutate `team_members` with RBAC check
+- `/api/reviews` — reads `reviews` table with date-range filtering and aggregation
+
+## RBAC Pattern
+
+Team management routes enforce role-based access control before any mutation:
+
+```ts
+const { data: callerRow } = await locals.supabase
+  .from('team_members').select('role').eq('user_id', user.id).maybeSingle();
+const isOwner = !callerRow;           // no row = workspace owner
+const isAdmin = callerRow?.role === 'admin';
+if (!isOwner && !isAdmin) error(403, 'Only admins can ...');
+```
 
 ## Mock / Demo Mode
 

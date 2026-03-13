@@ -1,8 +1,12 @@
 <script lang="ts">
-	import { Check, Zap, ArrowRight, ArrowLeft, CreditCard, Download } from 'lucide-svelte';
+	import { Check, Zap, ArrowRight, ArrowLeft, CreditCard, Download, AlertCircle } from 'lucide-svelte';
 
-	// Current plan — in production this comes from server data/Supabase
 	let currentPlan = $state<'free' | 'team' | 'business'>('free');
+	let seats = $state(1);
+	let invoices = $state<{ id: string; date: string; amount: string; status: string }[]>([]);
+	let usage = $state({ prs: { used: 0, limit: 10 }, seats: { used: 1, limit: 1 } });
+	let loadingBilling = $state(true);
+	let loadingUsage = $state(true);
 
 	interface Plan {
 		id: string;
@@ -14,6 +18,17 @@
 		features: readonly string[];
 		cta: string;
 	}
+
+	$effect(() => {
+		// Load billing data and usage in parallel
+		fetch('/api/billing').then(r => r.ok ? r.json() : null).then(d => {
+			if (d) { currentPlan = d.plan ?? 'free'; seats = d.seats ?? 1; invoices = d.invoices ?? []; }
+		}).finally(() => { loadingBilling = false; });
+
+		fetch('/api/billing/usage').then(r => r.ok ? r.json() : null).then(d => {
+			if (d) usage = d;
+		}).finally(() => { loadingUsage = false; });
+	});
 
 	const plans: Plan[] = [
 		{
@@ -68,17 +83,7 @@
 		},
 	];
 
-	// Usage meters
-	const usage = {
-		prs: { used: 7, limit: 10, label: 'PRs reviewed this month' },
-		seats: { used: 1, limit: 1, label: 'Seats used' },
-	};
 
-	// Demo invoices
-	const invoices = [
-		{ id: 'inv-001', date: 'Feb 2026', amount: '$0.00', status: 'paid' },
-		{ id: 'inv-002', date: 'Jan 2026', amount: '$0.00', status: 'paid' },
-	];
 
 	function usagePct(used: number, limit: number) {
 		return Math.min((used / limit) * 100, 100);
@@ -109,7 +114,10 @@
 		<div class="usage-card">
 			<span class="section-label">Free tier usage</span>
 			<div class="meters">
-				{#each Object.values(usage) as m}
+				{#each [
+				{ ...usage.prs, label: 'PRs reviewed this month' },
+				{ ...usage.seats, label: 'Seats used' },
+			] as m}
 					{@const pct = usagePct(m.used, m.limit)}
 					<div class="meter">
 						<div class="meter-head">
@@ -170,7 +178,7 @@
 					<button
 						class="plan-cta"
 						style="background: {plan.color};"
-						onclick={() => (currentPlan = plan.id as typeof currentPlan)}
+						onclick={() => {}}
 					>
 						{plan.cta}
 						<ArrowRight size={13} />

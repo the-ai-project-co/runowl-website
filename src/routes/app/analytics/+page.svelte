@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { upgradeStore } from '$lib/stores/upgrade.svelte';
 	import UpgradeGate from '$lib/components/app/UpgradeGate.svelte';
 	import { TrendingUp, TrendingDown, Minus, Calendar } from 'lucide-svelte';
@@ -12,34 +11,47 @@
 
 	const rangeDays: Record<Range, number> = { '7d': 7, '30d': 30, '90d': 90 };
 
-	// ── Demo data seeded from range ────────────────────────────────────────────
-	function seededRand(seed: number) {
-		let s = seed;
-		return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+	// ── Real analytics data from /api/reviews ────────────────────────────────
+	interface ApiData {
+		activity: number[];
+		findingsDist: { clean: number; low: number; medium: number; high: number };
+		topRepos: { repo: string; count: number }[];
+		thisWeek: number;
+		totalFindings: number;
+	}
+
+	let apiData = $state<ApiData | null>(null);
+	let loadingData = $state(false);
+
+	$effect(() => {
+		loadData(range);
+	});
+
+	async function loadData(r: typeof range) {
+		loadingData = true;
+		try {
+			const res = await fetch('/api/reviews?range=' + r);
+			if (res.ok) apiData = await res.json();
+		} catch { /* keep previous data */ }
+		finally { loadingData = false; }
 	}
 
 	const chartData = $derived(() => {
 		const days = rangeDays[range];
-		const rand = seededRand(days * 7);
+		const activity = apiData?.activity ?? Array(days).fill(0);
 		return Array.from({ length: days }, (_, i) => {
 			const d = new Date();
 			d.setDate(d.getDate() - (days - 1 - i));
-			return {
-				date: d,
-				reviews: Math.floor(rand() * 5),
-				findings: Math.floor(rand() * 8),
-			};
+			return { date: d, reviews: activity[i] ?? 0, findings: 0 };
 		});
 	});
 
-	// ── Summary stats ──────────────────────────────────────────────────────────
 	const totalReviews = $derived(() => chartData().reduce((s, d) => s + d.reviews, 0));
-	const totalFindings = $derived(() => chartData().reduce((s, d) => s + d.findings, 0));
+	const totalFindings = $derived(() => apiData?.totalFindings ?? 0);
 	const avgFindings = $derived(() =>
 		totalReviews() > 0 ? (totalFindings() / totalReviews()).toFixed(1) : '—'
 	);
 
-	// week-over-week trend
 	const trend = $derived(() => {
 		const data = chartData();
 		const half = Math.floor(data.length / 2);
@@ -50,28 +62,18 @@
 		return Math.round(((second - first) / first) * 100);
 	});
 
-	// ── Findings distribution ──────────────────────────────────────────────────
 	const dist = $derived(() => {
-		const rand = seededRand(rangeDays[range] * 3);
+		const d = apiData?.findingsDist ?? { clean: 0, low: 0, medium: 0, high: 0 };
 		return [
-			{ label: 'Clean', color: 'var(--green)', value: Math.floor(rand() * 20 + 5) },
-			{ label: 'Low', color: 'var(--yellow)', value: Math.floor(rand() * 12 + 3) },
-			{ label: 'Medium', color: '#f97316', value: Math.floor(rand() * 8 + 1) },
-			{ label: 'High', color: 'var(--red)', value: Math.floor(rand() * 4) },
+			{ label: 'Clean', color: 'var(--green)', value: d.clean },
+			{ label: 'Low', color: 'var(--yellow)', value: d.low },
+			{ label: 'Medium', color: '#f97316', value: d.medium },
+			{ label: 'High', color: 'var(--red)', value: d.high },
 		];
 	});
 	const distTotal = $derived(() => dist().reduce((s, d) => s + d.value, 0) || 1);
 
-	// ── Top repos ──────────────────────────────────────────────────────────────
-	const topRepos = $derived(() => {
-		const rand = seededRand(rangeDays[range] * 11);
-		return [
-			{ repo: 'acme/api', count: Math.floor(rand() * 20 + 8) },
-			{ repo: 'acme/web', count: Math.floor(rand() * 14 + 4) },
-			{ repo: 'acme/infra', count: Math.floor(rand() * 8 + 2) },
-			{ repo: 'acme/sdk', count: Math.floor(rand() * 5 + 1) },
-		].sort((a, b) => b.count - a.count);
-	});
+	const topRepos = $derived(() => apiData?.topRepos ?? []);
 	const maxRepoCount = $derived(() => Math.max(...topRepos().map((r) => r.count), 1));
 
 	// ── SVG activity chart ─────────────────────────────────────────────────────
